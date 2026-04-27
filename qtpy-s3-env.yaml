@@ -49,6 +49,21 @@ esp32_ble_tracker:
 bluetooth_proxy:
   connection_slots: 3
 
+power_supply:
+  - id: neopixel_power
+    pin: GPIO38
+
+light:
+  - platform: esp32_rmt_led_strip
+    name: "NeoPixel"
+    id: neopixel
+    pin: GPIO39
+    power_supply: neopixel_power
+    num_leds: 1
+    rgb_order: GRB
+    chipset: WS2812
+    use_dma: true
+
 i2c:
   sda: GPIO41
   scl: GPIO40
