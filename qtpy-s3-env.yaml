@@ -2,6 +2,13 @@ esphome:
   name: qtpy-s3-env
   friendly_name: "QT-Py S3 + Env"
 
+  # on_boot:
+  #   - light.addressable_set:
+  #         id: neopixel
+  #         red: 25%
+  #         green: 25%
+  #         blue: 0%
+
 esp32:
   variant: ESP32S3
   framework:
@@ -33,6 +40,12 @@ wifi:
     password: !secret wifi_ap_password
   fast_connect: true
   use_psram: true
+  # on_connect:
+  #   - light.addressable_set:
+  #         id: neopixel
+  #         red: 0%
+  #         green: 25%
+  #         blue: 0%
 
 web_server:
   ota: false
@@ -63,6 +76,12 @@ light:
     rgb_order: GRB
     chipset: WS2812
     use_dma: true
+    effects:
+      - pulse:
+          max_brightness: 25%
+      - addressable_rainbow:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
 
 i2c:
   sda: GPIO41
