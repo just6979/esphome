@@ -1,0 +1,79 @@
+esphome:
+  name: qtpy-s3-env
+  friendly_name: "QT-Py S3 + Env"
+
+esp32:
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+  flash_size: 4MB
+  cpu_frequency: 80MHz
+
+psram:
+  mode: quad
+  speed: 80MHz
+  ignore_not_found: false
+
+logger:
+  level: DEBUG
+
+api:
+  # encryption:
+  #   key: ""
+
+ota:
+  - platform: esphome
+  # password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "QT-Py S3 Env Setup"
+    password: !secret wifi_ap_password
+  fast_connect: true
+  use_psram: true
+
+web_server:
+  ota: false
+  local: true
+
+captive_portal:
+
+button:
+  - platform: restart
+    name: "Restart"
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  connection_slots: 3
+
+i2c:
+  sda: GPIO41
+  scl: GPIO40
+  scan: true
+  id: bus_qt
+
+# i2c:
+#   sda: GPIO7
+#   scl: GPIO6
+#   scan: true
+#   id: bus_pins
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: 60s
+
+  - platform: bme280_i2c
+    address: 0x76
+    temperature:
+      name: "Temperature"
+      id: bme_temp
+    humidity:
+      name: "Humidity"
+      id: bme_hum
+    pressure:
+      name: "Pressure"
+      id: bme_pres
