@@ -41,7 +41,8 @@ button:
 esp32_ble_tracker:
 
 bluetooth_proxy:
-  connection_slots: 3
+  connection_slots: 5
+  active: true
 
 i2c:
   sda: GPIO5

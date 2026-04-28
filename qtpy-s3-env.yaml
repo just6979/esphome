@@ -60,7 +60,8 @@ button:
 esp32_ble_tracker:
 
 bluetooth_proxy:
-  connection_slots: 3
+  active: true
+  connection_slots: 5
 
 power_supply:
   - id: neopixel_power
