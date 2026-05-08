@@ -1,6 +1,9 @@
+substitutions:
+  friendly_name: "Waveshare Geek ESP32-C6"
+
 esphome:
   name: ws-geek-c6
-  friendly_name: "Waveshare Geek ESP32-C6"
+  friendly_name: ${friendly_name}
   on_boot:
     priority: -100
     then:
@@ -63,7 +66,9 @@ bluetooth_proxy:
 
 i2c:
   sda: GPIO7
-  scl: GPIO8
+  scl:
+    number: GPIO8
+    ignore_strapping_warning: true
   scan: True
 
 # ─────────────────────────────────────────────────────
@@ -135,6 +140,7 @@ binary_sensor:
       number: GPIO9
       inverted: true
       mode: INPUT_PULLUP
+      ignore_strapping_warning: true
     name: "Button"
     id: button1
     on_press:
@@ -142,9 +148,6 @@ binary_sensor:
         - display.page.show_next: geek_display
         - component.update: geek_display
 
-# ─────────────────────────────────────────────────────
-# Color Palette  (defined once, used across all pages)
-# ─────────────────────────────────────────────────────
 color:
   - id: clr_white
     red: 100%
@@ -172,7 +175,6 @@ color:
   - id: clr_bg_system
     red: 25%
 
-# Display Configuration
 font:
   - file: "gfonts://Roboto"
     id: font_large
@@ -181,20 +183,10 @@ font:
     id: font_small
     size: 14
 
-# ─────────────────────────────────────────────────────
 # ST7789 — 1.14" 135×240 (Waveshare ESP32-C6-GEEK)
-#
-# Using "Custom" model so we can set the exact offsets
-# for this panel.  The TTGO T-Display preset has its own
-# pin defaults that don't match the GEEK.
-#
+# Using "Custom" model so we can set the exact offsets for this panel.
 # ST7789 controller is 240×320; our panel is 135×240.
 # Portrait gaps: col 52|135|53 = 240, row 40|240|40 = 320
-# After rotation 270°, offsets remap (Custom model does NOT
-# auto-adjust).  Values below are for the ROTATED frame:
-#   offset_width  = 40   (240px width in 320-row space)
-#   offset_height = 52   (135px height in 240-col space)
-# ─────────────────────────────────────────────────────
 display:
   - platform: st7789v
     model: Custom
@@ -203,13 +195,16 @@ display:
     height: 240
     offset_width: 52
     offset_height: 40
-    cs_pin: GPIO5
     dc_pin: GPIO3
-    reset_pin: GPIO4
+    reset_pin:
+      number: GPIO4
+      ignore_strapping_warning: true
+    cs_pin:
+      number: GPIO5
+      ignore_strapping_warning: true
     backlight_pin: no        # controlled separately via LEDC light
     data_rate: 40MHz
     update_interval: 500ms
-    rotation: 0
     pages:
       # ── PAGE 1: Network Status ──────────────────────
       - id: page_network
