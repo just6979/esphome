@@ -1,0 +1,5 @@
+substitutions:
+  dev_name: sm-c3-oled-test
+  friendly_name: "SuperMini ESP32-C3 OLED Test"
+
+<<: !include sm-c3-oled-base.yaml

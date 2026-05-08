@@ -1,5 +1,5 @@
 esphome:
-  name: geek-esp32-c6
+  name: ws-geek-c6
   friendly_name: "Waveshare Geek ESP32-C6"
   on_boot:
     priority: -100

@@ -1,5 +1,0 @@
-substitutions:
-  dev_name: sm-c3-oled-a
-  friendly_name: "SuperMini C3 OLED A"
-
-<<: !include supermini-c3-oled-base.yaml
