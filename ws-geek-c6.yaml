@@ -7,7 +7,9 @@ esphome:
   on_boot:
     priority: -100
     then:
-      - light.turn_on: lcd_backlight
+      - light.turn_on:
+          id: lcd_backlight
+          brightness: 75%
 
 esp32:
   variant: esp32c6
@@ -18,22 +20,12 @@ esp32:
 logger:
   level: DEBUG
 
-globals:
-  - id: ha_status
-    type: std::string
-    restore_value: no
-    initial_value: '"Unknown"'
-
 api:
   on_client_connected:
     - esp32_ble_tracker.start_scan:
         continuous: true
-    - lambda: |-
-        id(ha_status) = "Connected";
   on_client_disconnected:
     - esp32_ble_tracker.stop_scan:
-    - lambda: |-
-        id(ha_status) = "Disconnected";
 
 ota:
   - platform: esphome
@@ -69,7 +61,7 @@ i2c:
   scl:
     number: GPIO8
     ignore_strapping_warning: true
-  scan: True
+#  scan: True
 
 # ─────────────────────────────────────────────────────
 # SPI Bus for the LCD
@@ -88,7 +80,6 @@ output:
   - platform: ledc
     pin: GPIO6
     id: backlight_pin
-    frequency: 2000
 
 light:
   - platform: monochromatic
@@ -122,13 +113,13 @@ sensor:
      name: "Pressure"
      id: bme_pres
 
-  - platform: homeassistant
-    id: indoor_temp
-    entity_id:   sensor.zone_1_thermostat_current_temperature
-
-  - platform: homeassistant
-    id: indoor_hum
-    entity_id:   sensor.zone_1_thermostat_current_humidity
+#  - platform: homeassistant
+#    id: indoor_temp
+#    entity_id: sensor.zone_1_thermostat_current_temperature
+#
+#  - platform: homeassistant
+#    id: indoor_hum
+#    entity_id: sensor.zone_1_thermostat_current_humidity
 
   - platform: homeassistant
     id: backyard_temp
@@ -147,10 +138,10 @@ text_sensor:
       name: "Connected SSID"
       id: wifi_ssid
 
-  - platform: homeassistant
-    id: ha_datetime
-    name: "HA Datetime"
-    entity_id: sensor.date_time
+#  - platform: homeassistant
+#    id: ha_datetime
+#    name: "HA Datetime"
+#    entity_id: sensor.date_time
 
 # The Onboard Button (GPIO 9, active-low).
 # Pressing it cycles through the available pages.
@@ -243,15 +234,14 @@ display:
           it.printf(67, 5, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Indoors");
           it.printf(67, 30, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", (id(bme_temp).state * 9 / 5 ) + 32);
           it.printf(67, 55, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(bme_hum).state);
+          it.printf(67, 80, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", id(bme_pres).state);
 
-          it.printf(67, 90, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Backyard");
+          it.printf(67, 115, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Backyard");
           if (id(wifi_ssid).state != "") {
-            it.printf(67, 115, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", id(backyard_temp).state);
-            it.printf(67, 140, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(backyard_hum).state);
-          
-            //it.printf(67, 200, id(font_small), id(color_light_grey), TextAlign::BOTTOM_CENTER, "%s", id(ha_datetime).state);
+            it.printf(67, 140, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", id(backyard_temp).state);
+            it.printf(67, 165, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(backyard_hum).state);
           } else {
-            it.print(67, 115, id(font_large), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+            it.print(67, 140, id(font_large), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
           }
 
           it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 1/2");
@@ -271,7 +261,7 @@ display:
           }
 
           it.print(67, 110, id(font_large), id(color_orange), TextAlign::TOP_CENTER, "System");
-          it.printf(67, 140, id(font_small), id(color_blue), TextAlign::TOP_CENTER, "%d KB Free", esp_get_free_heap_size() / 1024);
+          it.printf(67, 140, id(font_small), id(color_white), TextAlign::TOP_CENTER, "%d KB Free", esp_get_free_heap_size() / 1024);
           it.printf(67, 160, id(font_small), id(color_green), TextAlign::TOP_CENTER, "%.0fs Uptime", id(uptime_s).state);
 
           it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2/2");
