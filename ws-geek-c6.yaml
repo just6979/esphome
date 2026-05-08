@@ -23,9 +23,12 @@ globals:
 
 api:
   on_client_connected:
+    - esp32_ble_tracker.start_scan:
+        continuous: true
     - lambda: |-
         id(ha_status) = "Connected";
   on_client_disconnected:
+    - esp32_ble_tracker.stop_scan:
     - lambda: |-
         id(ha_status) = "Disconnected";
 
@@ -51,9 +54,11 @@ button:
     name: Restart
 
 esp32_ble_tracker:
+  scan_parameters:
+    continuous: false
 
 bluetooth_proxy:
-  connection_slots: 4
+  connection_slots: 3
   active: true
 
 i2c:
