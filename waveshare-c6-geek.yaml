@@ -1,0 +1,267 @@
+esphome:
+  name: geek-esp32-c6
+  friendly_name: "Waveshare Geek ESP32-C6"
+  on_boot:
+    priority: -100
+    then:
+      - light.turn_on: lcd_backlight
+
+esp32:
+  variant: esp32c6
+  framework:
+    type: esp-idf
+  flash_size: 16MB
+
+logger:
+  level: DEBUG
+
+globals:
+  - id: ha_status
+    type: std::string
+    restore_value: no
+    initial_value: '"Unknown"'
+
+api:
+  on_client_connected:
+    - lambda: |-
+        id(ha_status) = "Connected";
+  on_client_disconnected:
+    - lambda: |-
+        id(ha_status) = "Disconnected";
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: ${friendly_name}
+    password: !secret wifi_ap_password
+  fast_connect: true
+
+web_server:
+  ota: false
+  local: true
+
+captive_portal:
+
+button:
+  - platform: restart
+    name: Restart
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  connection_slots: 4
+  active: true
+
+i2c:
+  sda: GPIO7
+  scl: GPIO8
+  scan: True
+
+# ─────────────────────────────────────────────────────
+# SPI Bus for the LCD
+# Pin mapping (from Waveshare ESP-IDF demo & confirmed
+# with CircuitPython on the actual hardware):
+#   SCLK = GPIO1    MOSI = GPIO2    DC  = GPIO3
+#   RST  = GPIO4    CS   = GPIO5    BL  = GPIO6
+#   BTN  = GPIO9
+# ─────────────────────────────────────────────────────
+spi:
+  clk_pin: GPIO1
+  mosi_pin: GPIO2
+
+# Backlight via LEDC PWM (allows brightness control)
+output:
+  - platform: ledc
+    pin: GPIO6
+    id: backlight_pin
+    frequency: 2000
+
+light:
+  - platform: monochromatic
+    output: backlight_pin
+    name: "Display Backlight"
+    id: lcd_backlight
+    icon: mdi:brightness-7
+    restore_mode: RESTORE_AND_ON
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_rssi
+    update_interval: 10s
+
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_s
+    update_interval: 10s
+
+  # - platform: bme280_i2c
+  #   address: 0x76
+  #   update_interval: 60s
+  #   temperature:
+  #     name: "Temperature"
+  #     id: bme_temp
+  #   humidity:
+  #     name: "Humidity"
+  #     id: bme_hum
+  #   pressure:
+  #     name: "Pressure"
+  #     id: bme_pres
+
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      id: wifi_ip
+    ssid:
+      name: "Connected SSID"
+      id: wifi_ssid
+
+# The Onboard Button (GPIO 9, active-low).
+# Pressing it cycles through the available pages.
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+      mode: INPUT_PULLUP
+    name: "Button"
+    id: button1
+    on_press:
+      then:
+        - display.page.show_next: geek_display
+        - component.update: geek_display
+
+# ─────────────────────────────────────────────────────
+# Color Palette  (defined once, used across all pages)
+# ─────────────────────────────────────────────────────
+color:
+  - id: clr_white
+    red: 100%
+    green: 100%
+    blue: 100%
+  - id: clr_grey
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: clr_red
+    red: 100%
+  - id: clr_green
+    green: 100%
+  - id: clr_blue
+    blue: 100%
+  - id: clr_yellow
+    red: 100%
+    green: 100%
+  - id: clr_orange
+    red: 100%
+    green: 64.7%
+    blue: 0%
+  - id: clr_bg_network
+    blue: 25%
+  - id: clr_bg_system
+    red: 25%
+
+# Display Configuration
+font:
+  - file: "gfonts://Roboto"
+    id: font_large
+    size: 20
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 14
+
+# ─────────────────────────────────────────────────────
+# ST7789 — 1.14" 135×240 (Waveshare ESP32-C6-GEEK)
+#
+# Using "Custom" model so we can set the exact offsets
+# for this panel.  The TTGO T-Display preset has its own
+# pin defaults that don't match the GEEK.
+#
+# ST7789 controller is 240×320; our panel is 135×240.
+# Portrait gaps: col 52|135|53 = 240, row 40|240|40 = 320
+# After rotation 270°, offsets remap (Custom model does NOT
+# auto-adjust).  Values below are for the ROTATED frame:
+#   offset_width  = 40   (240px width in 320-row space)
+#   offset_height = 52   (135px height in 240-col space)
+# ─────────────────────────────────────────────────────
+display:
+  - platform: st7789v
+    model: Custom
+    id: geek_display
+    width: 135
+    height: 240
+    offset_width: 52
+    offset_height: 40
+    cs_pin: GPIO5
+    dc_pin: GPIO3
+    reset_pin: GPIO4
+    backlight_pin: no        # controlled separately via LEDC light
+    data_rate: 40MHz
+    update_interval: 500ms
+    rotation: 0
+    pages:
+      # ── PAGE 1: Network Status ──────────────────────
+      - id: page_network
+        lambda: |-
+          it.fill(id(clr_bg_network));
+
+          // 1px dashed border (4px dash, 4px gap)
+          int w = it.get_width(), h = it.get_height();
+          for (int x = 0; x < w; x += 8) {
+            int len = std::min(4, w - x);
+            it.horizontal_line(x, 0, len, id(clr_grey));
+            it.horizontal_line(x, h - 1, len, id(clr_grey));
+          }
+          for (int y = 0; y < h; y += 8) {
+            int len = std::min(4, h - y);
+            it.vertical_line(0, y, len, id(clr_grey));
+            it.vertical_line(w - 1, y, len, id(clr_grey));
+          }
+
+          it.print(120, 5, id(font_large), id(clr_blue), TextAlign::TOP_CENTER, "NETWORK");
+
+          if (id(wifi_ssid).state != "") {
+            it.printf(10, 40, id(font_small), id(clr_white),  "SSID: %s", id(wifi_ssid).state.c_str());
+            it.printf(10, 60, id(font_small), id(clr_green),  "IP: %s",   id(wifi_ip).state.c_str());
+            it.printf(10, 80, id(font_small), id(clr_yellow), "RSSI: %.0f dBm", id(wifi_rssi).state);
+          } else {
+            it.print(120, 60, id(font_large), id(clr_red), TextAlign::CENTER, "Connecting...");
+          }
+
+          it.printf(230, 120, id(font_small), id(clr_grey), TextAlign::BOTTOM_RIGHT, "Pg 1/2");
+
+      # ── PAGE 2: System Monitor ──────────────────────
+      - id: page_monitor
+        lambda: |-
+          it.fill(id(clr_bg_system));
+
+          // 1px dashed border (4px dash, 4px gap)
+          int w = it.get_width(), h = it.get_height();
+          for (int x = 0; x < w; x += 8) {
+            int len = std::min(4, w - x);
+            it.horizontal_line(x, 0, len, id(clr_grey));
+            it.horizontal_line(x, h - 1, len, id(clr_grey));
+          }
+          for (int y = 0; y < h; y += 8) {
+            int len = std::min(4, h - y);
+            it.vertical_line(0, y, len, id(clr_grey));
+            it.vertical_line(w - 1, y, len, id(clr_grey));
+          }
+
+          it.print(120, 5, id(font_large), id(clr_orange), TextAlign::TOP_CENTER, "SYSTEM");
+          it.printf(10, 40, id(font_small), id(clr_white), "Free Heap: %d B", esp_get_free_heap_size());
+          it.printf(10, 60, id(font_small), id(clr_white), "Uptime: %.0fs", id(uptime_s).state);
+
+          if (id(button1).state) {
+            it.print(10, 80, id(font_small), id(clr_green), "Button: PRESSED");
+          } else {
+            it.print(10, 80, id(font_small), id(clr_grey), "Button: RELEASED");
+          }
+
+          it.printf(230, 120, id(font_small), id(clr_grey), TextAlign::BOTTOM_RIGHT, "Pg 2/2");
