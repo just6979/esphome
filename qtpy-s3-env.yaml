@@ -57,6 +57,9 @@ button:
   - platform: restart
     name: "Restart"
 
+esp32_ble:
+  max_connections: 5
+
 esp32_ble_tracker:
 
 bluetooth_proxy:
