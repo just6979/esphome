@@ -104,6 +104,11 @@ sensor:
     name: "WiFi Signal"
     update_interval: 60s
 
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_s
+    update_interval: 60s
+
   - platform: bme280_i2c
     address: 0x76
     temperature:
