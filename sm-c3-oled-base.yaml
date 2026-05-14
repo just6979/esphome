@@ -86,6 +86,7 @@ light:
     pin:
       number: GPIO08
       inverted: true
+      ignore_strapping_warning: true
 
 font:
   - file: "gfonts://Roboto"
