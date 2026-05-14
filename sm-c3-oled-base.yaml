@@ -79,68 +79,6 @@ sensor:
       name: "Pressure"
       id: bme_pres
 
-globals:
-  - id: click_type_text
-    type: std::string
-    restore_value: no
-    initial_value: ""
-
-  - id: click_type_map
-    type: std::map<std::string, std::string>
-    restore_value: no
-    initial_value: '{ {"single", "Single Click"}, {"double", "Double Click"}, {"long", "Long Press"} }'
-
-script:
-  - id: button_click_handler
-    parameters:
-      click_type: string
-    then:
-      - globals.set:
-          id: click_type_text
-          value: !lambda 'return id(click_type_map).count(click_type) ? id(click_type_map)[click_type] : "Unknown";'
-      # Send HA event
-      - homeassistant.event:
-          event: esphome.button_click
-          data:
-            device: ${dev_name}
-            type: ${click_type}
-            text: ${click_type_text}
-      - logger.log: 
-          format: "%s"
-          args: [ 'id(click_type_text).c_str()' ]
-      # Clear display after a delay
-      - script.execute: clear_click_type_timer
-
-  - id: clear_click_type_timer
-    mode: restart   # timer restarts if called again
-    then:
-      - delay: 5s
-      - globals.set:
-          id: click_type_text
-          value: '""'
-
-text:
-  - platform: template
-    name: "Line 1"
-    optimistic: true
-    id: custom_message
-    mode: text
-    initial_value: "Hello World"
-
-# HA helper
-# Create a "helper" in HA with Entity ID "input_text.esp_text".
-# Text value of the helper will be shown on the OLED display
-text_sensor:
-  - platform: homeassistant
-    name: "ESP Text"
-    id: esp_text_helper
-    entity_id: input_text.esp_text
-    on_value:
-      then:
-        - logger.log:
-            format: "ESP Text: %s"
-            args: ["x.c_str()"]
-
 light:
   - platform: status_led
     name: "Blue LED"
@@ -148,41 +86,6 @@ light:
     pin:
       number: GPIO08
       inverted: true
-
-binary_sensor:
-  - platform: gpio
-    name: "Boo Button"
-    id: binary_boo
-    pin:
-      number: GPIO09
-      inverted: true
-      mode: INPUT_PULLUP
-
-    on_multi_click:
-    - timing:
-        - ON for at most 0.8s
-        - OFF for at most 0.3s
-        - ON for at most 0.8s
-        - OFF for at least 0.2s
-      then:
-        - script.execute:
-            id: button_click_handler
-            click_type: 'double'
-    - timing:
-        - ON for 0.8s to 5s
-        - OFF for at least 0.4s
-      then:
-        - script.execute:
-            id: button_click_handler
-            click_type: 'long'
-        - light.toggle: light_status
-    - timing:
-        - ON for at most 0.8s
-        - OFF for at least 0.4s
-      then:
-        - script.execute:
-            id: button_click_handler
-            click_type: 'single'
 
 font:
   - file: "gfonts://Roboto"
@@ -197,6 +100,7 @@ display:
     contrast: 70%
     rotation: 180
     lambda: |-
-      it.printf(0, 0, id(roboto), "%s", id(custom_message).state.c_str());
-      it.print(0, 13, id(roboto), id(esp_text_helper).state.c_str());
-      it.print(0, 26, id(roboto), id(click_type_text).c_str());
+      it.printf(0, 0, id(roboto),  "T: %.1f° F", (id(bme_temp).state * 9 / 5) + 32);
+      it.printf(0, 13, id(roboto), "H: %.1f%% rh", id(bme_hum).state);
+      it.printf(0, 26, id(roboto), "P: %.1f mb", id(bme_pres).state);
+
