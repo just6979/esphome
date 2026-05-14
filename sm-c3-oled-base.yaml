@@ -98,7 +98,6 @@ display:
     model: "SSD1306 72x40"
     update_interval: 0.5s
     address: 0x3C
-    contrast: 70%
     rotation: 180
     lambda: |-
       it.printf(0, 0, id(roboto),  "T: %.1f° F", (id(bme_temp).state * 9 / 5) + 32);
