@@ -92,6 +92,7 @@ i2c:
   scl: GPIO40
   scan: true
   id: bus_qt
+  frequency: 400kHz
 
 # i2c:
 #   sda: GPIO7

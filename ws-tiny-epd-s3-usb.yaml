@@ -150,6 +150,7 @@ i2c:
   sda: GPIO47
   scl: GPIO48
   scan: True
+  frequency: 400kHz
 
 sensor:
   - platform: wifi_signal
