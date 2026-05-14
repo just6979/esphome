@@ -1,6 +1,9 @@
 substitutions:
   friendly_name: "Waveshare Geek ESP32-C6"
 
+  platformio_options:
+    upload_speed: 2000000
+
 esphome:
   name: ws-geek-c6
   friendly_name: ${friendly_name}

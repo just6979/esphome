@@ -1,7 +1,10 @@
 esphome:
   name: ws-tiny-epd-s3
   friendly_name: "Waveshare Tiny ePaper ESP32-S3"
-  
+
+  platformio_options:
+    upload_speed: 2000000
+
   on_boot:
     priority: 800
     then:
