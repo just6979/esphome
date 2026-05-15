@@ -227,7 +227,7 @@ display:
       ignore_strapping_warning: true
     backlight_pin: no        # controlled separately via LEDC light
     data_rate: 40MHz
-    update_interval: 500ms
+    update_interval: 10s
     pages:
       - id: page_climate
         lambda: |-
