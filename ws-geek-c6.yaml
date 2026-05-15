@@ -233,12 +233,17 @@ display:
     pages:
       - id: page_climate
         lambda: |-
+          float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
+          float hum = id(bme_hum).state;
+          float pres = id(bme_pres).state;
+          ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
+
           it.fill(id(color_black));
 
           it.printf(67, 5, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Indoors");
-          it.printf(67, 30, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", (id(bme_temp).state * 9 / 5 ) + 32);
-          it.printf(67, 55, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(bme_hum).state);
-          it.printf(67, 80, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", id(bme_pres).state);
+          it.printf(67, 30, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", temp_fht);
+          it.printf(67, 55, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", hum);
+          it.printf(67, 80, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", pres);
 
           it.printf(67, 115, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Backyard");
           if (id(wifi_ssid).state != "") {

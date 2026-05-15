@@ -236,6 +236,12 @@ display:
     rotation: 180
     
     lambda: |-
+      float temp_cel = id(bme_temp).state;
+      float temp_fht = (temp_cel * 9 / 5) + 32;
+      float hum = id(bme_hum).state;
+      float pres = id(bme_pres).state;
+      ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
+
       int top1 = 5;
       int top2 = 30;
       int top3 = 55;
@@ -251,13 +257,13 @@ display:
       it.print(middle, top1, id(roboto_20), COLOR_ON, TextAlign::TOP_CENTER, "Conditions");
 
       if (id(bme_temp).has_state()) {
-        it.printf(left, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(bme_temp).state * 1.8 + 32);
-        it.printf(left, top3, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°C", id(bme_temp).state);
+        it.printf(left, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", temp_fht);
+        it.printf(left, top3, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°C", temp_cel);
       } else {
         it.print(left, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "?Temp?");
       }
       if (id(bme_hum).has_state()) {
-        it.printf(right, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(bme_hum).state);
+        it.printf(right, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", hum);
       } else {
         it.print(right, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "?RelHum?");
       }
