@@ -107,7 +107,7 @@ sensor:
   - platform: bme280_i2c
     i2c_id: i2c_qt
     address: 0x76
-    update_interval: 10s
+    update_interval: 60s
     temperature:
       name: "Temperature"
       id: bme_temp
