@@ -110,14 +110,6 @@ sensor:
      name: "Pressure"
      id: bme_pres
 
-#  - platform: homeassistant
-#    id: indoor_temp
-#    entity_id: sensor.zone_1_thermostat_current_temperature
-#
-#  - platform: homeassistant
-#    id: indoor_hum
-#    entity_id: sensor.zone_1_thermostat_current_humidity
-
   - platform: homeassistant
     id: backyard_temp
     entity_id: sensor.backyard_temperature
