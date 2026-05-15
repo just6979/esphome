@@ -91,17 +91,17 @@ light:
 #      - addressable_random_twinkle:
 
 i2c:
-  sda: GPIO41
-  scl: GPIO40
-  scan: true
-  id: bus_qt
-  frequency: 400kHz
+  - id: i2c_qt
+    sda: GPIO41
+    scl: GPIO40
+    scan: true
+    frequency: 400kHz
 
-# i2c:
-#   sda: GPIO7
-#   scl: GPIO6
-#   scan: true
-#   id: bus_pins
+  - id: i2c_pins
+    sda: GPIO7
+    scl: GPIO6
+    scan: true
+    frequency: 400kHz
 
 sensor:
   - platform: wifi_signal
@@ -114,7 +114,9 @@ sensor:
     update_interval: 60s
 
   - platform: bme280_i2c
+    i2c_id: i2c_qt
     address: 0x76
+    update_interval: 10s
     temperature:
       name: "Temperature"
       id: bme_temp
