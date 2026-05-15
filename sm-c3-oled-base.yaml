@@ -54,6 +54,7 @@ i2c:
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal"
+    id: wifi_rssi
     update_interval: 60s
 
   - platform: uptime

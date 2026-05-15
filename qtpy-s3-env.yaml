@@ -57,8 +57,8 @@ esp32_ble:
 esp32_ble_tracker:
 
 bluetooth_proxy:
-  active: true
   connection_slots: 5
+  active: true
 
 power_supply:
   - id: neopixel_power
@@ -97,6 +97,7 @@ i2c:
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal"
+    id: wifi_rssi
     update_interval: 60s
 
   - platform: uptime
