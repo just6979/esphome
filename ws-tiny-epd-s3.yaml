@@ -98,10 +98,6 @@ wifi:
   fast_connect: true
   use_psram: true
 
-web_server:
-  ota: false
-  local: true
-
 captive_portal:
 
 button:

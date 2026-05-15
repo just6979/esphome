@@ -50,10 +50,6 @@ wifi:
         green: 25%
         blue: 0%
 
-web_server:
-  ota: false
-  local: true
-
 captive_portal:
 
 button:

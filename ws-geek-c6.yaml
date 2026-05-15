@@ -43,10 +43,6 @@ wifi:
     password: !secret wifi_ap_password
   fast_connect: true
 
-web_server:
-  ota: false
-  local: true
-
 captive_portal:
 
 button:
