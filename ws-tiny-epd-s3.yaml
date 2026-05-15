@@ -82,8 +82,8 @@ logger:
   level: DEBUG
   
 api:
-  # encryption:
-  #   key: ""
+  encryption:
+    key: !secret ws-tiny-epd-s3-key
 
 ota:
   - platform: esphome

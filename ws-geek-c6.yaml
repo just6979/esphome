@@ -24,6 +24,8 @@ logger:
   level: DEBUG
 
 api:
+  encryption:
+    key: !secret ws-geek-c6-key
   on_client_connected:
     - esp32_ble_tracker.start_scan:
         continuous: true

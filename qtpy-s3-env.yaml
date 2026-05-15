@@ -28,8 +28,8 @@ logger:
   level: DEBUG
 
 api:
-  # encryption:
-  #   key: ""
+  encryption:
+    key: !secret qtpy-s3-env-key
 
 ota:
   - platform: esphome
