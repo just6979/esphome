@@ -96,6 +96,9 @@ binary_sensor:
             id(display_on) = !id(display_on);
             ESP_LOGD("buttons", "Display on: %b", id(display_on));
         - component.update: oled
+    on_double_click:
+      then:
+        - light.toggle: light_status
 
 switch:
   - platform: template
