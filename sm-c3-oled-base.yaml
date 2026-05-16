@@ -15,6 +15,12 @@ esp32:
 logger:
   level: DEBUG
 
+globals:
+  - id: display_on
+    type: bool
+    restore_value: yes
+    initial_value: "true"
+
 api:
   encryption:
     key: ${api_key}
@@ -75,6 +81,43 @@ sensor:
       name: "Pressure"
       id: bme_pres
 
+binary_sensor:
+  - platform: gpio
+    name: "Left Button"
+    id: left_button
+    pin:
+      number: GPIO09
+      inverted: true
+      mode: INPUT_PULLUP
+      ignore_strapping_warning: true
+    on_click:
+      then:
+        - lambda: |-
+            id(display_on) = !id(display_on);
+            ESP_LOGD("buttons", "Display on: %b", id(display_on));
+        - component.update: oled
+
+switch:
+  - platform: template
+    name: "Display"
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      if (id(display_on)) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          id(display_on) = true;
+          ESP_LOGD("buttons", "Display on: %d", id(display_on));
+      - component.update: oled
+    turn_off_action:
+      - lambda: |-
+          id(display_on) = false;
+          ESP_LOGD("buttons", "Display on: %d", id(display_on));
+      - component.update: oled
+
 light:
   - platform: status_led
     name: "Blue LED"
@@ -92,14 +135,19 @@ font:
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 72x40"
+    id: oled
     update_interval: 10s
     address: 0x3C
     rotation: 180
     lambda: |-
-      float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
-      float hum = id(bme_hum).state;
-      float pres = id(bme_pres).state;
-      it.printf(0, 0, id(roboto),  "T: %.1f° F", temp_fht);
-      it.printf(0, 13, id(roboto), "H: %.1f%% rh", hum);
-      it.printf(0, 26, id(roboto), "P: %.1f mb", pres);
-      ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
+      if (id(display_on)) {
+        float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
+        float hum = id(bme_hum).state;
+        float pres = id(bme_pres).state;
+        it.printf(0, 0, id(roboto),  "T: %.1f° F", temp_fht);
+        it.printf(0, 13, id(roboto), "H: %.1f%% rh", hum);
+        it.printf(0, 26, id(roboto), "P: %.1f mb", pres);
+      } else {
+        it.fill(COLOR_OFF);
+      }
+      //ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
