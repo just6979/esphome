@@ -42,7 +42,7 @@ esphome:
             and:
               - api.connected:
               - sensor.in_range:
-                  id: bme_temp
+                  id: frontyard_temperature
                   above: -100
               # Ensure we have a valid clock time from Home Assistant
               - lambda: 'return id(ha_time).now().is_valid();'
@@ -52,8 +52,8 @@ esphome:
       - delay: 2s 
       
       # UPDATE DISPLAY & SLEEP
-      - component.update: oled_display
-      - delay: 20s
+      - component.update: epaper_display
+      - delay: 30s
       - deep_sleep.enter: deep_sleep_1
 
   # SHUTDOWN SEQUENCE
@@ -116,24 +116,30 @@ time:
     address: 0x51
     update_interval: never
 
-#binary_sensor:
-#  - platform: gpio
-#    pin: GPIO0
-#    name: "Button 1"
-#    on_click:
-#      then:
-#        - component.update: oled_display
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      inverted: true
+      mode: INPUT_PULLUP
+      ignore_strapping_warning: true
+    name: "Button 1"
+    on_click:
+      then:
+        - deep_sleep.enter: deep_sleep_1
 
 deep_sleep:
   id: deep_sleep_1
   run_duration:
-    default: 30s
-    gpio_wakeup_reason: 30s
-  sleep_duration: 30min
-  wakeup_pin:
-    number: GPIO18
-    inverted: true
-    mode: INPUT_PULLUP
+    default: 60s
+    gpio_wakeup_reason: 60s
+  sleep_duration: 60min
+  esp32_ext1_wakeup:
+    pins:
+      - number: GPIO18
+        inverted: true
+        mode: INPUT_PULLUP
+    mode: ANY_LOW
 
 spi:
   clk_pin: GPIO12
@@ -149,25 +155,13 @@ i2c:
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal"
+    id: wifi_rssi
     update_interval: 60s
 
   - platform: uptime
     name: "Uptime"
     id: uptime_s
     update_interval: 60s
-
-  - platform: bme280_i2c
-    address: 0x76
-    update_interval: 60s
-    temperature:
-      name: "Temperature"
-      id: bme_temp
-    humidity:
-      name: "Humidity"
-      id: bme_hum
-    pressure:
-      name: "Pressure"
-      id: bme_pres
 
   - platform: adc
     pin: GPIO4
@@ -178,15 +172,21 @@ sensor:
     filters:
       - multiply: 2.0
 
-  # - platform: shtcx
-  #   address: 0x70
-  #   update_interval: 60s
-  #   temperature:
-  #     name: "Temperature (Internal)"
-  #     id: sht_temp
-  #   humidity:
-  #     name: "Humidity (Internal)"
-  #     id: sht_hum
+  - platform: homeassistant
+    id: frontyard_temperature
+    entity_id: sensor.frontyard_temperature
+
+  - platform: homeassistant
+    id: frontyard_humidity
+    entity_id: sensor.frontyard_humidity
+
+  - platform: homeassistant
+    id: backyard_temperature
+    entity_id: sensor.backyard_temperature
+
+  - platform: homeassistant
+    id: backyard_humidity
+    entity_id: sensor.backyard_humidity
 
 font:
   - file: "gfonts://Roboto"
@@ -213,7 +213,7 @@ output:
 
 display:
   - platform: waveshare_epaper
-    id: oled_display
+    id: epaper_display
     cs_pin: GPIO11
     dc_pin: GPIO10
     reset_pin: GPIO9
@@ -225,17 +225,11 @@ display:
     full_update_every: 10
     reset_duration: 10ms
     rotation: 90
-    
     lambda: |-
-      float temp_cel = id(bme_temp).state;
-      float temp_fht = (temp_cel * 9 / 5) + 32;
-      float hum = id(bme_hum).state;
-      float pres = id(bme_pres).state;
-      ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
-
       int top1 = 5;
       int top2 = 30;
-      int top3 = 55;
+      int top3 = 60;
+      int top4 = 85;
       int bot1 = 195;
       int bot2 = 165;
       int bot3 = 140;
@@ -245,19 +239,13 @@ display:
 
       it.fill(COLOR_OFF);
 
-      it.print(middle, top1, id(roboto_20), COLOR_ON, TextAlign::TOP_CENTER, "Conditions");
-
-      if (id(bme_temp).has_state()) {
-        it.printf(left, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", temp_fht);
-        it.printf(left, top3, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°C", temp_cel);
-      } else {
-        it.print(left, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "?Temp?");
-      }
-      if (id(bme_hum).has_state()) {
-        it.printf(right, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", hum);
-      } else {
-        it.print(right, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "?RelHum?");
-      }
+      it.print(middle, top1, id(roboto_20), COLOR_ON, TextAlign::TOP_CENTER, "Front Yard");
+      it.printf(left, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(frontyard_temperature).state);
+      it.printf(right, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(frontyard_humidity).state);
+              
+      it.print(middle, top3, id(roboto_20), COLOR_ON, TextAlign::TOP_CENTER, "Back Yard");
+      it.printf(left, top4, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(backyard_temperature).state);
+      it.printf(right, top4, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(backyard_humidity).state);
 
       it.print(middle, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_CENTER, "Last Update");
       if (id(ha_time).now().is_valid()) {
