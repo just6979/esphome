@@ -73,9 +73,13 @@ sensor:
     temperature:
       name: "Temperature"
       id: bme_temp
+      filters:
+        ${bme_temp_filters}
     humidity:
       name: "Humidity"
       id: bme_hum
+      filters:
+        ${bme_hum_filters}
     pressure:
       name: "Pressure"
       id: bme_pres
