@@ -71,7 +71,6 @@ esp32:
   framework:
     type: esp-idf
   flash_size: 8MB
-  cpu_frequency: 80MHz
 
 psram:
   mode: octal

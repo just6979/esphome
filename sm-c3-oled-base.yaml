@@ -10,7 +10,6 @@ esp32:
   framework:
     type: esp-idf
   flash_size: 4MB
-  cpu_frequency: 80MHz
 
 logger:
   level: DEBUG
