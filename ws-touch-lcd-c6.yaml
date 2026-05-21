@@ -1,0 +1,418 @@
+substitutions:
+  device_name: esp32-c6-lcd
+  friendly_name: "Waveshare ESP32-C6 Touch LCD 1.47"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+  on_boot:
+    priority: -100
+    then:
+      - switch.turn_on: screen_switch
+
+  platformio_options:
+    upload_speed: 2000000
+
+esp32:
+  variant: ESP32C6
+  framework:
+    type: esp-idf
+  flash_size: 8MB
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret ws-touch-lcd-c6-key
+#  on_client_connected:
+#    - esp32_ble_tracker.start_scan:
+#        continuous: true
+#  on_client_disconnected:
+#    - esp32_ble_tracker.stop_scan:
+
+ota:
+  - platform: esphome
+  # password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+#zigbee:
+#  id: ws_touch_lcd_c6
+#  router: true
+
+button:
+  - platform: restart
+    name: Restart
+
+#esp32_ble_tracker:
+#  scan_parameters:
+#    continuous: false
+#
+#bluetooth_proxy:
+#  connection_slots: 3
+#  active: true
+
+time:
+  - platform: homeassistant
+    id: ha_time
+    timezone: America/New_York
+
+color:
+  - id: color_white
+    hex: 'FFFFFF'
+  - id: color_black
+    hex: '000000'
+  - id: color_blue
+    hex: '0000FF'
+  - id: color_green
+    hex: '00FF00'
+  - id: color_gray
+    hex: 'C6C6C6'
+  - id: color_red
+    hex: 'FF0000'
+  - id: color_orange
+    hex: 'F5C77E'
+  - id: color_cyan
+    hex: '00FFFF'
+  - id: color_yellow
+    hex: 'FFFF00'
+  - id: color_purple
+    hex: 'A020F0'
+
+globals:
+  - id: last_touch_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: last_touch_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: touch_start_time
+    type: unsigned long
+    restore_value: no
+    initial_value: '0'
+  - id: is_touching
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: last_touch_type
+    type: std::string
+    restore_value: no
+    initial_value: '"None"'
+  - id: last_slide_direction
+    type: std::string
+    restore_value: no
+    initial_value: '"None"'
+  - id: touch_start_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: touch_start_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+
+# Text Sensors
+text_sensor:
+  - platform: wifi_info
+    ssid:
+      name: "WiFi SSID"
+      id: wifi_ssid
+
+    ip_address:
+      name: "WiFi IP"
+      id: wifi_ip
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+      mode: INPUT_PULLUP
+      ignore_strapping_warning: true
+    name: "Button"
+    id: button1
+
+i2c:
+  sda: GPIO18
+  scl: GPIO19
+  scan: True
+  frequency: 400kHz
+
+external_components:
+#  - source: github://dala318/esphome-qmi8658
+#    components: [qmi8658]
+#    refresh: 5s
+  - source: github://widget/esphome-components
+    components: [ axs5106 ]
+    refresh: 0s
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_rssi
+    update_interval: 10s
+
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_s
+    update_interval: 10s
+
+#  - platform: qmi8658
+#    address: 0x6B
+##    interrupt_pin_1: GPIO5
+##    interrupt_pin_2: GPIO6       # Warning! Activating this with debug logging may kill your prompt ;)
+##    acceleration_range: 4g
+##    acceleration_odr: 100hz
+#    acceleration_x:
+#      name: "QMI8658 Acceleration X"
+#    acceleration_y:
+#      name: "QMI8658 Acceleration Y"
+#    acceleration_z:
+#      name: "QMI8658 Acceleration Z"
+##      filters:
+##        - multiply: -1.0   # Invert Z axis to match orientation
+#    gyroscope_x:
+#      name: "QMI8658 Gyro X"
+#    gyroscope_y:
+#      name: "QMI8658 Gyro Y"
+#    gyroscope_z:
+#      name: "QMI8658 Gyro Z"
+#    temperature:
+#      name: "QMI8658 Temperature"
+#    update_interval: 5s
+
+# Touchscreen
+touchscreen:
+  platform: axs5106
+  id: my_touchscreen
+  interrupt_pin: 21
+  reset_pin: 20
+  calibration:
+    x_min: 0
+    y_min: 0
+    y_max: 320
+    x_max: 172
+  transform:
+    mirror_x: True
+  on_touch:
+    - lambda: |-
+        id(is_touching) = true;
+        id(touch_start_time) = millis();
+        id(touch_start_x) = touch.x;
+        id(touch_start_y) = touch.y;
+        id(last_touch_x) = touch.x;
+        id(last_touch_y) = touch.y;
+
+  on_update:
+    - lambda: |-
+        if (id(is_touching) && !touches.empty()) {
+          id(last_touch_x) = touches[0].x;
+          id(last_touch_y) = touches[0].y;
+        }
+
+  on_release:
+    - lambda: |-
+        id(is_touching) = false;
+        unsigned long duration = millis() - id(touch_start_time);
+
+        // Calculate movement
+        int delta_x = id(last_touch_x) - id(touch_start_x);
+        int delta_y = id(last_touch_y) - id(touch_start_y);
+
+        // Total distance (Pythagorean theorem)
+        float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
+
+        // Minimum threshold to consider a slide
+        const float SLIDE_THRESHOLD = 20.0;
+
+        if (distance > SLIDE_THRESHOLD) {
+          // It's a slide - calculate angle
+          id(last_touch_type) = "Slide";
+
+          // Angle in degrees (0° = right, 90° = down, 180° = left, 270° = up)
+          float angle_rad = atan2(delta_y, delta_x);
+          float angle_deg = angle_rad * 180.0 / 3.14159265;
+
+          // Normalize angle between 0 and 360
+          if (angle_deg < 0) angle_deg += 360.0;
+
+          // Determine direction by angle
+          // Right: 315-45°, Down: 45-135°, Left: 135-225°, Up: 225-315°
+          if ((angle_deg >= 315.0) || (angle_deg < 45.0)) {
+            id(last_slide_direction) = "Right";
+          } else if (angle_deg < 135.0) {
+            id(last_slide_direction) = "Down";
+          } else if (angle_deg < 225.0) {
+            id(last_slide_direction) = "Left";
+          } else {
+            id(last_slide_direction) = "Up";
+          }
+
+          ESP_LOGI("touch", "Slide %s: distance=%.1f px, angle=%.1f°, start(%d,%d) end(%d,%d)",
+                   id(last_slide_direction).c_str(), distance, angle_deg,
+                   id(touch_start_x), id(touch_start_y),
+                   id(last_touch_x), id(last_touch_y));
+        } else {
+          // It's a tap (simple press)
+          id(last_slide_direction) = "None";
+          if (duration < 300) {
+            id(last_touch_type) = "Short press";
+            ESP_LOGI("touch", "Short press at (%d,%d), duration: %lums",
+                     id(last_touch_x), id(last_touch_y), duration);
+          } else {
+            id(last_touch_type) = "Long press";
+            ESP_LOGI("touch", "Long press at (%d,%d), duration: %lums",
+                     id(last_touch_x), id(last_touch_y), duration);
+          }
+        }
+
+    - homeassistant.event:
+        event: esphome.touch_event
+        data:
+          type: !lambda 'return id(last_touch_type).c_str();'
+          direction: !lambda 'return id(last_slide_direction).c_str();'
+          start_x: !lambda 'return id(touch_start_x);'
+          start_y: !lambda 'return id(touch_start_y);'
+          end_x: !lambda 'return id(last_touch_x);'
+          end_y: !lambda 'return id(last_touch_y);'
+
+output:
+  - platform: ledc
+    id: lcd_backlight
+    pin: GPIO23
+    inverted: false
+    frequency: 1000 Hz
+
+switch:
+  - platform: template
+    name: "Display ON⁄OFF"
+    id: screen_switch
+    turn_on_action:
+      - output.turn_on: lcd_backlight
+    turn_off_action:
+      - output.turn_off: lcd_backlight
+    optimistic: true
+
+number:
+  - platform: template
+    name: "Screen Brightness"
+    id: display_brightness
+    optimistic: true
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 20
+    restore_value: true
+    mode: slider
+    on_value:
+      then:
+        - output.set_level:
+            id: lcd_backlight
+            level: !lambda "return x / 100.0;"
+
+spi:
+  clk_pin: GPIO1
+  mosi_pin: GPIO2
+
+# Fonts
+font:
+  - file: "gfonts://Roboto"
+    id: roboto12
+    size: 12
+
+  - file: "gfonts://Roboto"
+    id: roboto20
+    size: 20
+
+# LCD Display (172x320 ST7789V)
+display:
+  - platform: mipi_spi
+    id: lcd
+    model: ST7789V
+    dc_pin:
+      number: GPIO15
+      ignore_strapping_warning: true
+    cs_pin: GPIO14
+    reset_pin: GPIO22
+    dimensions:
+      width: 172
+      height: 320
+      offset_height: 0
+      offset_width: 34
+    transform:
+      swap_xy: false
+      mirror_x: false
+      mirror_y: true
+    invert_colors: false
+    data_rate: 40MHz
+    color_order: bgr
+    update_interval: 1s
+    lambda: |-
+      // Header
+      it.filled_rectangle(0, 0, 172, 40, id(color_green));
+      it.print(it.get_width() / 2, 10, id(roboto20), id(color_black), TextAlign::TOP_CENTER, "${device_name}");
+      it.line(0, 40, 172, 40, id(color_gray));
+
+      // WiFi
+      it.print(10, 50, id(roboto20), id(color_white), "WiFi");
+      if (id(wifi_ssid).has_state()) {
+        it.printf(10, 70, id(roboto12), id(color_yellow), "SSID: %s", id(wifi_ssid).state.c_str());
+      }
+      if (id(wifi_ip).has_state()) {
+        it.printf(10, 85, id(roboto12), id(color_yellow), "IP: %s", id(wifi_ip).state.c_str());
+      }
+
+      it.line(0, 120, 172, 120, id(color_gray));
+
+      // System
+      it.print(10, 130, id(roboto20), id(color_white), "System");
+      if (id(uptime_s).has_state()) {
+        it.printf(10, 150, id(roboto12), id(color_orange), "Uptime: %.0f", id(uptime_s).state);
+      }
+
+      it.line(0, 185, 172, 185, id(color_gray));
+
+      // Touch
+      it.print(10, 195, id(roboto20), id(color_white), "Touch");
+      
+      // Touch type with conditional color
+      Color touch_color = id(color_white);
+      if (id(last_touch_type) == "Short press") {
+        touch_color = id(color_cyan);
+      } else if (id(last_touch_type) == "Long press") {
+        touch_color = id(color_purple);
+      } else if (id(last_touch_type) == "Slide") {
+        touch_color = id(color_orange);
+      }
+      it.printf(10, 215, id(roboto12), touch_color, "Type: %s", id(last_touch_type).c_str());
+      
+      // Slide direction
+      if (id(last_slide_direction) != "None") {
+        Color direction_color = id(color_white);
+        if (id(last_slide_direction) == "Left") {
+          direction_color = id(color_blue);
+        } else if (id(last_slide_direction) == "Right") {
+          direction_color = id(color_green);
+        } else if (id(last_slide_direction) == "Up") {
+          direction_color = id(color_yellow);
+        } else if (id(last_slide_direction) == "Down") {
+          direction_color = id(color_red);
+        }
+        it.printf(10, 230, id(roboto12), direction_color, "Dir: %s", id(last_slide_direction).c_str());
+        it.printf(10, 245, id(roboto12), id(color_gray), "Start: %d,%d", id(touch_start_x), id(touch_start_y));
+        it.printf(10, 260, id(roboto12), id(color_gray), "End: %d,%d", id(last_touch_x), id(last_touch_y));
+      } else {
+        // Show coordinates for simple press
+        it.printf(10, 230, id(roboto12), touch_color, "X: %d  Y: %d", id(last_touch_x), id(last_touch_y));
+      }
+
+      // Footer - Current time
+      it.strftime(86, 300, id(roboto12), id(color_white), TextAlign::BOTTOM_CENTER, "%H:%M:%S", id(ha_time).now());
