@@ -203,11 +203,13 @@ sensor:
     update_interval: 60s
 
   - platform: adc
-    pin: GPIO4
     name: "Battery Voltage"
+    pin: GPIO4
     id: battery_voltage
+    accuracy_decimals: 2
     update_interval: 60s
     attenuation: auto
+    samples: 10
     filters:
       - multiply: 2.0
 
