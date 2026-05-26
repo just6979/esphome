@@ -102,8 +102,7 @@ binary_sensor:
       ignore_strapping_warning: true
       mode: INPUT_PULLUP
       inverted: true
-    id: left_top_button
-    internal: true
+    id: button_minus
     on_multi_click:
       - timing:
           - ON for at least 50ms
@@ -115,9 +114,27 @@ binary_sensor:
         then:
           - button.press: factory_reset_btn
 
+  - platform: gpio
+    pin:
+      number: GPIO4
+      mode: INPUT_PULLUP
+      inverted: true
+    id: button_plus
+
+  - platform: gpio
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+      inverted: true
+    id: button_power
+
+  - platform: gpio
+    pin: GPIO3
+    id: charge_status
+
 output:
   - platform: ledc
-    pin: GPIO47
+    pin: GPIO46
     id: backlight_output
 
 light:
@@ -134,6 +151,24 @@ i2c:
   - id: i2c_adc_dac
     scl: GPIO18
     sda: GPIO8
+
+sensor:
+  - platform: adc
+    name: "Battery Voltage"
+    pin: GPIO1
+    id: battery_voltage
+    accuracy_decimals: 2
+    update_interval: 60s
+    attenuation: auto
+    samples: 10
+    filters:
+      - multiply: 2.0
+
+touchscreen:
+  platform: cst816
+  id: my_touchscreen
+  interrupt_pin: GPIO48
+  reset_pin: GPIO47
 
 i2s_audio:
   - id: i2s_audio_bus
