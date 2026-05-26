@@ -97,7 +97,7 @@ binary_sensor:
       then:
         - lambda: |-
             id(display_on) = !id(display_on);
-            ESP_LOGD("buttons", "Display on: %b", id(display_on));
+            ESP_LOGD("buttons", "Display: %s", id(display_on) ? "ON" : "OFF");
         - component.update: oled
     on_double_click:
       then:
