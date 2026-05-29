@@ -78,6 +78,7 @@ esp32:
   framework:
     type: esp-idf
   flash_size: 8MB
+  # run at min speed when awake since we're on battery
   cpu_frequency: 80MHz
 
 psram:
@@ -105,6 +106,13 @@ wifi:
 button:
   - platform: restart
     name: "Restart"
+
+# act as a bluetooth proxy when awake if we're on USB power
+#esp32_ble_tracker:
+#
+#bluetooth_proxy:
+#  connection_slots: 5
+#  active: true
 
 time:
   - platform: homeassistant
