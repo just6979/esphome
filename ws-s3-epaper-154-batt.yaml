@@ -32,8 +32,6 @@ esphome:
           gpio_reset_pin(GPIO_NUM_3);
           gpio_set_direction(GPIO_NUM_3, GPIO_MODE_OUTPUT);
           
-          // Turn on green LED until sleep (Active Low: 0 = ON)
-          gpio_set_level(GPIO_NUM_3, 0);
 
       # ENABLE PERIPHERALS
       - output.turn_on: epd_power
@@ -56,6 +54,7 @@ esphome:
       - delay: 2s 
       
       # UPDATE DISPLAY & SLEEP
+      - light.turn_on: green_led
       - component.update: epaper_display
 #      - delay: 30s
 #      - if:
@@ -123,6 +122,14 @@ time:
     id: pcf85063_time
     address: 0x51
     update_interval: never
+
+light:
+  - platform: status_led
+    id: green_led
+    name: "Green LED"
+    pin:
+      number: GPIO3
+      inverted: true
 
 globals:
   - id: stay_awake
