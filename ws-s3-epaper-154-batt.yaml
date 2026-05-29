@@ -57,8 +57,12 @@ esphome:
       
       # UPDATE DISPLAY & SLEEP
       - component.update: epaper_display
-      - delay: 30s
-      - deep_sleep.enter: deep_sleep_1
+#      - delay: 30s
+#      - if:
+#          condition:
+#            lambda: 'return id(stay_awake);'
+#          then:
+#            deep_sleep.enter: deep_sleep_1
 
   # SHUTDOWN SEQUENCE
   on_shutdown:
@@ -120,6 +124,36 @@ time:
     address: 0x51
     update_interval: never
 
+globals:
+  - id: stay_awake
+    type: bool
+    restore_value: yes
+    initial_value: "false"
+
+switch:
+  - platform: template
+    id: stay_awake_switch
+    name: "Stay Awake"
+    restore_mode: RESTORE_DEFAULT_OFF
+    lambda: |-
+      if (id(stay_awake)) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+          id(stay_awake) = true;
+      - logger.log: "Staying awake"
+      - deep_sleep.prevent: deep_sleep_1
+      - component.update: epaper_display
+    turn_off_action:
+      - lambda: |-
+          id(stay_awake) = false;
+      - logger.log: "Getting Sleepy"
+      - deep_sleep.allow: deep_sleep_1
+      - component.update: epaper_display
+
 binary_sensor:
   - platform: gpio
     pin:
@@ -127,7 +161,17 @@ binary_sensor:
       inverted: true
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
-    name: "Button 1"
+      allow_other_uses: true
+    name: "Button Light"
+    on_click:
+      then:
+        - component.update: epaper_display
+  - platform: gpio
+    pin:
+      number: GPIO18
+      inverted: true
+      allow_other_uses: true
+    name: "Button Power"
     on_click:
       then:
         - deep_sleep.enter: deep_sleep_1
@@ -143,6 +187,11 @@ deep_sleep:
       - number: GPIO18
         inverted: true
         mode: INPUT_PULLUP
+        allow_other_uses: true
+      - number: GPIO0
+        inverted: true
+        mode: INPUT_PULLUP
+        allow_other_uses: true
     mode: ANY_LOW
 
 spi:
@@ -226,8 +275,9 @@ display:
       number: GPIO8
       inverted: false
     model: 1.54inv2
-    update_interval: never
-    full_update_every: 10
+    # update the display automatically when staying awake
+    update_interval: 60s
+    full_update_every: 4
     reset_duration: 10ms
     rotation: 90
     lambda: |-
@@ -280,4 +330,10 @@ display:
       } else {
         it.print(right, bot2, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?Volts?");
         it.print(right, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?Bat%?");
+      }
+      
+      if (id(stay_awake)) {
+        it.print(middle+7, bot1, id(roboto_16), COLOR_ON, TextAlign::BOTTOM_CENTER, "Awake");
+      } else {
+        it.print(middle+7, bot1, id(roboto_16), COLOR_ON, TextAlign::BOTTOM_CENTER, "Sleepy");
       }
