@@ -106,13 +106,6 @@ button:
   - platform: restart
     name: "Restart"
 
-# we're on usb power and not sleeping, so be another bluetooth proxy
-#esp32_ble_tracker:
-
-#bluetooth_proxy:
-#  connection_slots: 5
-#  active: true
-
 time:
   - platform: homeassistant
     id: ha_time
@@ -200,11 +193,6 @@ deep_sleep:
         mode: INPUT_PULLUP
         allow_other_uses: true
     mode: ANY_LOW
-
-spi:
-  clk_pin: GPIO12
-  mosi_pin: GPIO13
-  interface: hardware
 
 i2c:
   sda: GPIO47
@@ -308,6 +296,11 @@ font:
   - file: "gfonts://Roboto"
     id: roboto_60
     size: 60
+
+spi:
+  clk_pin: GPIO12
+  mosi_pin: GPIO13
+  interface: hardware
 
 output:
   - platform: gpio
