@@ -233,6 +233,16 @@ sensor:
     filters:
       - multiply: 2.0
 
+  - platform: shtcx
+    address: 0x70
+    update_interval: 60s
+    temperature:
+      name: "Temperature"
+      id: sht_temp
+    humidity:
+      name: "Humidity"
+      id: sht_hum
+
   - platform: homeassistant
     id: frontyard_temperature
     entity_id: sensor.frontyard_temperature
