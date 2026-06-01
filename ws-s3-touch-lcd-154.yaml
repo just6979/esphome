@@ -40,7 +40,6 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   min_version: 2026.4.0
-  name_add_mac_suffix: true
   on_boot:
     priority: 600
     then:
@@ -53,22 +52,26 @@ esphome:
             - lambda: id(init_in_progress) = false;
             - script.execute: draw_display
 
+  platformio_options:
+    upload_speed: 2000000
+
 esp32:
-  board: esp32s3box
+  variant: esp32s3
   flash_size: 16MB
-  cpu_frequency: 240MHz
   framework:
     type: esp-idf
-    sdkconfig_options:
-      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
-      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
-      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
 
 psram:
   mode: octal
   speed: 80MHz
+  ignore_not_found: false
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
 
 api:
+  encryption:
+    key: !secret ws-s3-touch-lcd-154-key
   on_client_connected:
     - script.execute: draw_display
   on_client_disconnected:
@@ -76,81 +79,73 @@ api:
 
 ota:
   - platform: esphome
-    id: ota_esphome
-
-logger:
-  hardware_uart: USB_SERIAL_JTAG
 
 wifi:
-  ap:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   on_connect:
     - script.execute: draw_display
   on_disconnect:
     - script.execute: draw_display
 
-captive_portal:
-
 button:
-  - platform: factory_reset
-    id: factory_reset_btn
-    internal: true
+  - platform: restart
+    name: "Restart"
 
 binary_sensor:
   - platform: gpio
     pin:
       number: GPIO0
-      ignore_strapping_warning: true
-      mode: INPUT_PULLUP
       inverted: true
+      ignore_strapping_warning: true
     id: button_minus
-    on_multi_click:
-      - timing:
-          - ON for at least 50ms
-          - OFF for at least 50ms
-        then:
-          - switch.turn_off: timer_ringing
-      - timing:
-          - ON for at least 10s
-        then:
-          - button.press: factory_reset_btn
+    on_click:
+      then:
+        - media_player.volume_down
 
   - platform: gpio
     pin:
       number: GPIO4
-      mode: INPUT_PULLUP
       inverted: true
     id: button_plus
+    on_click:
+      then:
+        - media_player.volume_up
 
   - platform: gpio
     pin:
       number: GPIO5
-      mode: INPUT_PULLUP
       inverted: true
     id: button_power
+    on_click:
+      then:
+        - switch.turn_off: timer_ringing
 
   - platform: gpio
-    pin: GPIO3
+    pin:
+      number: GPIO3
+      inverted: true
+      ignore_strapping_warning: true
     id: charge_status
+    name: "USB Power"
 
 output:
   - platform: ledc
-    pin: GPIO46
+    pin:
+      number: GPIO46
+      ignore_strapping_warning: true
     id: backlight_output
 
 light:
   - platform: monochromatic
-    id: led
-    name: Screen
-    icon: "mdi:television"
-    entity_category: config
+    id: display_backight
+    name: "Display Backlight"
     output: backlight_output
     restore_mode: RESTORE_DEFAULT_ON
-    default_transition_length: 250ms
 
 i2c:
-  - id: i2c_adc_dac
-    scl: GPIO18
-    sda: GPIO8
+    scl: GPIO41
+    sda: GPIO42
 
 sensor:
   - platform: adc
@@ -158,69 +153,52 @@ sensor:
     pin: GPIO1
     id: battery_voltage
     accuracy_decimals: 2
-    update_interval: 60s
     attenuation: auto
     filters:
       - multiply: 2.0
 
-touchscreen:
-  platform: cst816
-  id: my_touchscreen
-  interrupt_pin: GPIO48
-  reset_pin: GPIO47
-
 i2s_audio:
-  - id: i2s_audio_bus
-    i2s_lrclk_pin:
-      number: GPIO45
-      ignore_strapping_warning: true
-    i2s_bclk_pin: GPIO17
-    i2s_mclk_pin: GPIO2
+    i2s_lrclk_pin: GPIO10
+    i2s_bclk_pin: GPIO9
+    i2s_mclk_pin: GPIO8
 
 audio_adc:
   - platform: es7210
-    i2c_id: i2c_adc_dac
-    id: es7210_adc
-    bits_per_sample: 16bit
-    sample_rate: 16000
 
 audio_dac:
   - platform: es8311
-    i2c_id: i2c_adc_dac
-    id: es8311_dac
-    bits_per_sample: 16bit
     sample_rate: 48000
 
 microphone:
   - platform: i2s_audio
-    id: box_mic
-    sample_rate: 16000
-    i2s_din_pin: GPIO16
-    bits_per_sample: 16bit
+    id: the_mic
     adc_type: external
+    i2s_din_pin: GPIO11
+    bits_per_sample: 16bit
 
 speaker:
   - platform: i2s_audio
-    id: box_speaker
-    i2s_dout_pin: GPIO15
+    id: the_speaker
     dac_type: external
+    i2s_dout_pin: GPIO12
     sample_rate: 48000
-    bits_per_sample: 16bit
-    channel: left
-    audio_dac: es8311_dac
-    buffer_duration: 100ms
+
+  - platform: mixer
+    output_speaker: the_speaker
+    source_speakers:
+      - id: announcement_mixer
+      - id: media_mixer
 
 media_player:
   - platform: speaker
-    name: None
-    id: speaker_media_player
-    volume_min: 0.5
-    volume_max: 0.8
+    name: "Media Player"
+    id: the_media_player
+    volume_min: 25%
+    volume_max: 100%
     announcement_pipeline:
-      speaker: box_speaker
-      format: FLAC
-      sample_rate: 48000
-      num_channels: 1  # S3 Box only has one output channel
+      speaker: announcement_mixer
+    media_pipeline:
+      speaker: media_mixer
     files:
       - id: timer_finished_sound
         file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
@@ -262,7 +240,6 @@ micro_wake_word:
   id: mww
   models:
     - okay_nabu
-    - hey_mycroft
     - hey_jarvis
   on_wake_word_detected:
     - voice_assistant.start:
@@ -270,8 +247,8 @@ micro_wake_word:
 
 voice_assistant:
   id: va
-  microphone: box_mic
-  media_player: speaker_media_player
+  microphone: the_mic
+  media_player: the_media_player
   micro_wake_word: mww
   noise_suppression_level: 2
   auto_gain: 31dBFS
@@ -311,7 +288,7 @@ voice_assistant:
             - not:
                 media_player.is_announcing:
             - not:
-                speaker.is_playing:
+                speaker.is_playing: the_speaker
     # Restart only mWW if enabled; streaming wake words automatically restart
     - if:
         condition:
@@ -386,46 +363,46 @@ script:
                         - lambda: |
                             switch(id(voice_assistant_phase)) {
                               case ${voice_assist_listening_phase_id}:
-                                id(s3_box_lcd).show_page(listening_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(listening_page);
+                                id(lcd).update();
                                 break;
                               case ${voice_assist_thinking_phase_id}:
-                                id(s3_box_lcd).show_page(thinking_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(thinking_page);
+                                id(lcd).update();
                                 break;
                               case ${voice_assist_replying_phase_id}:
-                                id(s3_box_lcd).show_page(replying_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(replying_page);
+                                id(lcd).update();
                                 break;
                               case ${voice_assist_error_phase_id}:
-                                id(s3_box_lcd).show_page(error_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(error_page);
+                                id(lcd).update();
                                 break;
                               case ${voice_assist_muted_phase_id}:
-                                id(s3_box_lcd).show_page(muted_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(muted_page);
+                                id(lcd).update();
                                 break;
                               case ${voice_assist_not_ready_phase_id}:
-                                id(s3_box_lcd).show_page(no_ha_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(no_ha_page);
+                                id(lcd).update();
                                 break;
                               case ${voice_assist_timer_finished_phase_id}:
-                                id(s3_box_lcd).show_page(timer_finished_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(timer_finished_page);
+                                id(lcd).update();
                                 break;
                               default:
-                                id(s3_box_lcd).show_page(idle_page);
-                                id(s3_box_lcd).update();
+                                id(lcd).show_page(idle_page);
+                                id(lcd).update();
                             }
                       else:
                         - display.page.show: no_ha_page
-                        - component.update: s3_box_lcd
+                        - component.update: lcd
                 else:
                   - display.page.show: no_wifi_page
-                  - component.update: s3_box_lcd
+                  - component.update: lcd
           else:
             - display.page.show: initializing_page
-            - component.update: s3_box_lcd
+            - component.update: lcd
 
   - id: fetch_first_active_timer
     then:
@@ -481,15 +458,15 @@ script:
             id(fetch_first_active_timer).execute();
             int active_pixels = round( 320 * id(global_first_active_timer).seconds_left / max(id(global_first_active_timer).total_seconds , static_cast<uint32_t>(1)) );
             if (active_pixels > 0){
-              id(s3_box_lcd).filled_rectangle(0 , 225 , 320 , 15 , Color::WHITE );
-              id(s3_box_lcd).filled_rectangle(0 , 226 , active_pixels , 13 , id(active_timer_color) );
+              id(lcd).filled_rectangle(0 , 225 , 320 , 15 , Color::WHITE );
+              id(lcd).filled_rectangle(0 , 226 , active_pixels , 13 , id(active_timer_color) );
             }
           } else if (id(global_is_timer)){
             id(fetch_first_timer).execute();
             int active_pixels = round( 320 * id(global_first_timer).seconds_left / max(id(global_first_timer).total_seconds , static_cast<uint32_t>(1)));
             if (active_pixels > 0){
-              id(s3_box_lcd).filled_rectangle(0 , 225 , 320 , 15 , Color::WHITE );
-              id(s3_box_lcd).filled_rectangle(0 , 226 , active_pixels , 13 , id(paused_timer_color) );
+              id(lcd).filled_rectangle(0 , 225 , 320 , 15 , Color::WHITE );
+              id(lcd).filled_rectangle(0 , 226 , active_pixels , 13 , id(paused_timer_color) );
             }
           }
   - id: draw_active_timer_widget
@@ -497,8 +474,8 @@ script:
       - lambda: |
           id(check_if_timers_active).execute();
           if (id(global_is_timer_active)){
-            id(s3_box_lcd).filled_rectangle(80 , 40 , 160 , 50 , Color::WHITE );
-            id(s3_box_lcd).rectangle(80 , 40 , 160 , 50 , Color::BLACK );
+            id(lcd).filled_rectangle(80 , 40 , 160 , 50 , Color::WHITE );
+            id(lcd).rectangle(80 , 40 , 160 , 50 , Color::BLACK );
 
             id(fetch_first_active_timer).execute();
             int hours_left = floor(id(global_first_active_timer).seconds_left / 3600);
@@ -514,7 +491,7 @@ script:
             } else {
               display_string = display_minute + ":" + display_seconds;
             }
-            id(s3_box_lcd).printf(120, 47, id(font_timer), Color::BLACK, "%s", display_string.c_str());
+            id(lcd).printf(120, 47, id(font_timer), Color::BLACK, "%s", display_string.c_str());
           }
   # Starts either mWW or the streaming wake word, depending on the configured location
   - id: start_wake_word
@@ -566,18 +543,15 @@ switch:
   - platform: gpio
     name: Speaker Enable
     pin:
-      number: GPIO46
-      ignore_strapping_warning: true
+      number: GPIO7
     restore_mode: RESTORE_DEFAULT_ON
-    entity_category: config
-    disabled_by_default: true
+
   - platform: template
     name: Mute
     id: mute
     icon: "mdi:microphone-off"
     optimistic: true
     restore_mode: RESTORE_DEFAULT_OFF
-    entity_category: config
     on_turn_off:
       - microphone.unmute:
       - lambda: id(voice_assistant_phase) = ${voice_assist_idle_phase_id};
@@ -586,6 +560,7 @@ switch:
       - microphone.mute:
       - lambda: id(voice_assistant_phase) = ${voice_assist_muted_phase_id};
       - script.execute: draw_display
+
   - platform: template
     id: timer_ringing
     optimistic: true
@@ -594,24 +569,24 @@ switch:
     on_turn_off:
       # Turn off the repeat mode and disable the pause between playlist items
       - lambda: |-
-          id(speaker_media_player)
+          id(the_media_player)
             ->make_call()
             .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_OFF)
             .set_announcement(true)
             .perform();
-          id(speaker_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 0);
+          id(the_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 0);
       # Stop playing the alarm
       - media_player.stop:
           announcement: true
     on_turn_on:
       # Turn on the repeat mode and pause for 1000 ms between playlist items/repeats
       - lambda: |-
-          id(speaker_media_player)
+          id(the_media_player)
             ->make_call()
             .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_ONE)
             .set_announcement(true)
             .perform();
-          id(speaker_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 1000);
+          id(the_media_player)->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 1000);
       - media_player.speaker.play_on_device_media_file:
           media_file: timer_finished_sound
           announcement: true
@@ -620,7 +595,6 @@ switch:
 
 select:
   - platform: template
-    entity_category: config
     name: Wake word engine location
     id: wake_word_engine_location
     icon: "mdi:account-voice"
@@ -797,23 +771,35 @@ color:
   - id: paused_timer_color
     hex: "3b89e3"
 
+touchscreen:
+  platform: cst816
+  id: the_touchscreen
+  display: lcd
+  interrupt_pin: GPIO48
+  reset_pin: GPIO47
+  on_update:
+    - lambda: |-
+        for (auto touch: touches)  {
+            if (touch.state <= 2) {
+               ESP_LOGI("Touch points:", "id=%d x=%d, y=%d", touch.id, touch.x, touch.y);
+            }
+        }
+
 spi:
-  - id: spi_bus
-    clk_pin: 7
-    mosi_pin: 6
+    clk_pin: GPIO38
+    mosi_pin: GPIO39
 
 display:
   - platform: mipi_spi
-    id: s3_box_lcd
-    model: S3BOX
-    invert_colors: false
+    id: lcd
+    model: ST7789V
     data_rate: 40MHz
-    cs_pin: 5
-    dc_pin: 4
-    reset_pin:
-      number: 48
-      inverted: true
-    update_interval: never
+    cs_pin: GPIO21
+    dc_pin:
+      number: GPIO45
+      ignore_strapping_warning: true
+    reset_pin: GPIO40
+    update_interval: 1s
     pages:
       - id: idle_page
         lambda: |-
