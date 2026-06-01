@@ -66,6 +66,14 @@ esphome:
   # SHUTDOWN SEQUENCE
   on_shutdown:
     then:
+      - logger.log: "Getting ready for sleep"
+      - globals.set:
+          id: wake_status
+          value: '"Asleep"'
+      - component.update: epaper_display
+      - logger.log: "Sleeping in 5s"
+      - delay: 5s
+      - logger.log: "Sleeping now"
       - lambda: |-
           // Maintain Power Latch until the very last millisecond
           gpio_set_level(GPIO_NUM_17, 1);
@@ -143,6 +151,10 @@ globals:
     type: bool
     restore_value: yes
     initial_value: "false"
+  - id: wake_status
+    type: std::string
+    restore_value: yes
+    initial_value: '"Awake"'
 
 switch:
   - platform: template
@@ -158,12 +170,14 @@ switch:
     turn_on_action:
       - lambda: |-
           id(stay_awake) = true;
+          id(wake_status) = "Awake";
       - logger.log: "Staying Awake"
       - deep_sleep.prevent: deep_sleep_1
       - component.update: epaper_display
     turn_off_action:
       - lambda: |-
           id(stay_awake) = false;
+          id(wake_status) = "Sleepy";
       - logger.log: "Getting Sleepy"
       - deep_sleep.allow: deep_sleep_1
       - component.update: epaper_display
@@ -334,7 +348,7 @@ display:
     model: 1.54inv2
     # update the display automatically when staying awake
     update_interval: 300s
-    full_update_every: 2
+    full_update_every: 1
     rotation: 90
     lambda: |-
       int top1 = 0;
@@ -367,11 +381,7 @@ display:
         it.print(left, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Time?");
       }
 
-      if (id(stay_awake)) {
-        it.print(right, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "Awake");
-      } else {
-        it.print(right, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "Sleepy");
-      }
+      it.print(right, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, id(wake_status).c_str());
       if (id(battery_voltage).has_state()) {
         float v = id(battery_voltage).state;
         it.printf(right, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f V", v);
