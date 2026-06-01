@@ -176,16 +176,17 @@ binary_sensor:
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
       allow_other_uses: true
-    name: "Button Light"
+    id: button_light
     on_click:
       then:
         - component.update: epaper_display
+
   - platform: gpio
     pin:
       number: GPIO18
       inverted: true
       allow_other_uses: true
-    name: "Button Power"
+    id: button_power
     on_click:
       then:
         - deep_sleep.enter: deep_sleep_1
