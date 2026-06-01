@@ -107,6 +107,11 @@ button:
   - platform: restart
     name: "Restart"
 
+  - platform: template
+    name: "Refresh Display"
+    on_press:
+      - component.update: epaper_display
+
 # act as a bluetooth proxy when awake if we're on USB power
 #esp32_ble_tracker:
 #
