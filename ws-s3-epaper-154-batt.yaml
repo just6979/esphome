@@ -131,6 +131,7 @@ light:
     pin:
       number: GPIO3
       inverted: true
+      ignore_strapping_warning: true
 
 globals:
   - id: stay_awake
@@ -152,7 +153,7 @@ switch:
     turn_on_action:
       - lambda: |-
           id(stay_awake) = true;
-      - logger.log: "Staying awake"
+      - logger.log: "Staying Awake"
       - deep_sleep.prevent: deep_sleep_1
       - component.update: epaper_display
     turn_off_action:
@@ -200,6 +201,7 @@ deep_sleep:
         inverted: true
         mode: INPUT_PULLUP
         allow_other_uses: true
+        ignore_strapping_warning: true
     mode: ANY_LOW
 
 i2c:
@@ -322,14 +324,11 @@ display:
     cs_pin: GPIO11
     dc_pin: GPIO10
     reset_pin: GPIO9
-    busy_pin: 
-      number: GPIO8
-      inverted: false
+    busy_pin: GPIO8
     model: 1.54inv2
     # update the display automatically when staying awake
     update_interval: 60s
     full_update_every: 4
-    reset_duration: 10ms
     rotation: 90
     lambda: |-
       int top1 = 5;
