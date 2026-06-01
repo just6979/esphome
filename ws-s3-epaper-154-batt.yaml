@@ -337,16 +337,16 @@ display:
     full_update_every: 4
     rotation: 90
     lambda: |-
-      int top1 = 5;
-      int top2 = 30;
-      int top3 = 60;
-      int top4 = 85;
-      int bot1 = 195;
-      int bot2 = 165;
-      int bot3 = 140;
-      int left = 10;
+      int top1 = 0;
+      int top2 = 20;
+      int top3 = 50;
+      int top4 = 70;
+      int bot3 = 150;
+      int bot2 = 175;
+      int bot1 = 200;
+      int left = 0;
       int middle = 100;
-      int right = 190;
+      int right = 200;
 
       it.fill(COLOR_OFF);
 
@@ -358,38 +358,34 @@ display:
       it.printf(left, top4, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(backyard_temperature).state);
       it.printf(right, top4, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(backyard_humidity).state);
 
-      it.print(middle, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_CENTER, "Last Update");
+      it.print(left, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "Last Update");
       if (id(ha_time).now().is_valid()) {
         it.strftime(left, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "%Y-%m-%d", id(ha_time).now());
         it.strftime(left, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_LEFT, "%H:%M", id(ha_time).now());
       } else {
-        it.print(left, bot2, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Date?");
+        it.print(left, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Date?");
         it.print(left, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Time?");
       }
 
+      if (id(stay_awake)) {
+        it.print(right, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "Awake");
+      } else {
+        it.print(right, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "Sleepy");
+      }
       if (id(battery_voltage).has_state()) {
         float v = id(battery_voltage).state;
-        it.printf(right, bot2, id(roboto_16), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f V", v);
-
+        it.printf(right, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f V", v);
         // Map 3.2V (0%) to 4.1V (100%)
         float bat_min = 3.2;
         float bat_max = 4.1;
         int bat_pct = (int)((v - bat_min) / (bat_max - bat_min) * 100.0);
-        if (bat_pct > 100) bat_pct = 100;
-        if (bat_pct < 0) bat_pct = 0;
-        // Show "LOW BAT" if 10% or under, otherwise show normal percentage
+        // Show "LOW%" if 10% or under, otherwise show normal percentage
         if (bat_pct <= 10) {
-          it.print(right, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "BAT LOW");
+          it.print(right, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "LOW%");
         } else {
           it.printf(right, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%d%%", bat_pct);
         }
       } else {
-        it.print(right, bot2, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?Volts?");
-        it.print(right, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?Bat%?");
-      }
-      
-      if (id(stay_awake)) {
-        it.print(middle+7, bot1, id(roboto_16), COLOR_ON, TextAlign::BOTTOM_CENTER, "Awake");
-      } else {
-        it.print(middle+7, bot1, id(roboto_16), COLOR_ON, TextAlign::BOTTOM_CENTER, "Sleepy");
+        it.print(right, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?.??V");
+        it.print(right, bot1, id(roboto_24), COLOR_ON, TextAlign::BOTTOM_RIGHT, "??%");
       }
