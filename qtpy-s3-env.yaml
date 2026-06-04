@@ -52,6 +52,8 @@ button:
 
 esp32_ble:
   max_connections: 5
+  use_psram: true
+
 
 esp32_ble_tracker:
 

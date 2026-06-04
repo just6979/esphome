@@ -121,6 +121,9 @@ button:
       - component.update: epaper_display
 
 # act as a bluetooth proxy when awake if we're on USB power
+esp32_ble:
+  use_psram: true
+
 esp32_ble_tracker:
 
 bluetooth_proxy:
