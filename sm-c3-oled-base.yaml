@@ -125,7 +125,6 @@ switch:
 
 light:
   - platform: status_led
-    name: "Blue LED"
     id: light_status
     pin:
       number: GPIO08
