@@ -95,11 +95,13 @@ binary_sensor:
       then:
         - lambda: |-
             id(display_on) = !id(display_on);
-            ESP_LOGD("buttons", "Display: %s", id(display_on) ? "ON" : "OFF");
+            ESP_LOGD("button", "Display: %s", id(display_on) ? "ON" : "OFF");
         - component.update: oled
     on_double_click:
       then:
         - light.toggle: light_status
+        - lambda: |-
+            ESP_LOGD("button", "Blue LED: %s", id(light_status).current_values.is_on() ? "ON" : "OFF");
 
 switch:
   - platform: template
@@ -114,12 +116,12 @@ switch:
     turn_on_action:
       - lambda: |-
           id(display_on) = true;
-          ESP_LOGD("buttons", "Display on: %d", id(display_on));
+          ESP_LOGD("switch", "Display: ON");
       - component.update: oled
     turn_off_action:
       - lambda: |-
           id(display_on) = false;
-          ESP_LOGD("buttons", "Display on: %d", id(display_on));
+          ESP_LOGD("switch", "Display: OFF");
       - component.update: oled
 
   - platform: template
