@@ -1,11 +1,7 @@
 esphome:
   name: ${dev_name}
   friendly_name: ${friendly_name}
-
-  platformio_options:
-    upload_speed: 2000000
-  environment_variables:
-    PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
+  <<: !include shared/esphome-options.yaml
 
 esp32:
   variant: ESP32C3

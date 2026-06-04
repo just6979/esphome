@@ -5,16 +5,11 @@ substitutions:
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
-
+  <<: !include shared/esphome-options.yaml
   on_boot:
     priority: -100
     then:
       - switch.turn_on: screen_switch
-
-  platformio_options:
-    upload_speed: 2000000
-  environment_variables:
-    PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
 
 esp32:
   variant: ESP32C6

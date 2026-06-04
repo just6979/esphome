@@ -1,0 +1,5 @@
+min_version: 2026.5.0
+platformio_options:
+  upload_speed: 2000000
+environment_variables:
+  PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
