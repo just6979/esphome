@@ -85,7 +85,6 @@ sensor:
 
 binary_sensor:
   - platform: gpio
-    name: "Left Button"
     id: left_button
     pin:
       number: GPIO09
