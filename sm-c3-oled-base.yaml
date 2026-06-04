@@ -122,6 +122,20 @@ switch:
           ESP_LOGD("buttons", "Display on: %d", id(display_on));
       - component.update: oled
 
+  - platform: template
+    name: "Blue LED"
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      return id(light_status).current_values.is_on();
+    turn_on_action:
+      - lambda: |-
+          ESP_LOGD("switch", "Blue LED: ON");
+      - light.turn_on: light_status
+    turn_off_action:
+      - lambda: |-
+          ESP_LOGD("switch", "Blue LED: OFF");
+      - light.turn_off: light_status
+
 light:
   - platform: status_led
     id: light_status
