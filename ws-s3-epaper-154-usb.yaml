@@ -8,6 +8,8 @@ esphome:
 
   platformio_options:
     upload_speed: 2000000
+  environment_variables:
+    PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
 
   on_boot:
     priority: 800

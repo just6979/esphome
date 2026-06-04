@@ -54,6 +54,8 @@ esphome:
 
   platformio_options:
     upload_speed: 2000000
+  environment_variables:
+    PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
 
 esp32:
   variant: esp32s3
