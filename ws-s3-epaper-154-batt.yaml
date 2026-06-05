@@ -2,11 +2,10 @@ substitutions:
   name: ws-epaper-154-s3
   friendly_name: "Waveshare ePaper 1.54 ESP32-S3"
 
-esphome:
-  name: ${name}
-  friendly_name: ${friendly_name}
-  <<: !include shared/esphome-options.yaml
+packages:
+  esphome-options: !include shared/esphome-options.yaml
 
+esphome:
   on_boot:
     priority: 800
     then:

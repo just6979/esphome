@@ -1,7 +1,9 @@
-esphome:
-  name: ${dev_name}
-  friendly_name: ${friendly_name}
-  <<: !include shared/esphome-options.yaml
+substitutions:
+  device_name: ws-touch-lcd-147-c6
+  friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
+
+packages:
+  esphome-options: !include shared/esphome-options.yaml
 
 esp32:
   variant: ESP32C3

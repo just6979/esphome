@@ -1,4 +1,3 @@
----
 substitutions:
   name: ws-touch-lcd-154-s3
   friendly_name: "Waveshare Touch LCD 1.54 ESP32-S3"
@@ -36,11 +35,10 @@ substitutions:
   # for Greek use "Noto Sans" for other languages use a compatible font family
   font_family: Figtree
 
+packages:
+  esphome-options: !include shared/esphome-options.yaml
+
 esphome:
-  name: ${name}
-  friendly_name: ${friendly_name}
-  min_version: 2026.5.0
-  <<: !include shared/esphome-options.yaml
   on_boot:
     priority: 600
     then:

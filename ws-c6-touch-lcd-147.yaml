@@ -2,10 +2,10 @@ substitutions:
   device_name: ws-touch-lcd-147-c6
   friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
 
+packages:
+  esphome-options: !include shared/esphome-options.yaml
+
 esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
-  <<: !include shared/esphome-options.yaml
   on_boot:
     priority: -100
     then:

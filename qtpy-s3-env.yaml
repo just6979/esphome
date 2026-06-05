@@ -1,12 +1,11 @@
+substitutions:
+  device_name: ws-touch-lcd-147-c6
+  friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
+
+packages:
+  esphome-options: !include shared/esphome-options.yaml
+
 esphome:
-  name: qtpy-s3-env
-  friendly_name: "QT-Py S3 + Env"
-
-  platformio_options:
-    upload_speed: 2000000
-  environment_variables:
-    PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
-
   on_boot:
     - light.addressable_set:
          id: neopixel

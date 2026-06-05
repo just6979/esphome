@@ -1,10 +1,11 @@
+packages:
+  sm-cd-oled-base: !include sm-c3-oled-base.yaml
+
 substitutions:
-  dev_name: sm-c3-oled-test
+  device_name: sm-c3-oled-test
   friendly_name: "SuperMini ESP32-C3 OLED Test"
   api_key: !secret sm-c3-oled-test-key
   bme_temp_filters:
     - offset: 0.0
   bme_hum_filters:
     - offset: 0.0
-
-<<: !include sm-c3-oled-base.yaml

@@ -1,5 +1,5 @@
 substitutions:
-  dev_name: sm-c3-oled-a
+  device_name: sm-c3-oled-a
   friendly_name: "SuperMini ESP32-C3 OLED A"
   api_key: !secret sm-c3-oled-a-key
   bme_temp_filters:

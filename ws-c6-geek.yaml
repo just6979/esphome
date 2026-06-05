@@ -1,10 +1,10 @@
 substitutions:
   friendly_name: "Waveshare Geek ESP32-C6"
 
+packages:
+  esphome-options: !include shared/esphome-options.yaml
+
 esphome:
-  name: ws-geek-c6
-  friendly_name: ${friendly_name}
-  <<: !include shared/esphome-options.yaml
   on_boot:
     priority: -100
     then:
