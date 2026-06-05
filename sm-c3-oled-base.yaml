@@ -1,55 +1,21 @@
+packages:
+  common-options: !include common-ble.yaml
+
 substitutions:
   device_name: ws-touch-lcd-147-c6
   friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
-
-packages:
-  esphome-options: !include shared/esphome-options.yaml
+  api_key: ${api_key}
 
 esp32:
   variant: ESP32C3
-  framework:
-    type: esp-idf
   flash_size: 4MB
 #  toolchain: esp-idf
-
-logger:
-  level: DEBUG
 
 globals:
   - id: display_on
     type: bool
     restore_value: yes
     initial_value: "true"
-
-api:
-  encryption:
-    key: ${api_key}
-  on_client_connected:
-    - esp32_ble_tracker.start_scan:
-        continuous: true
-  on_client_disconnected:
-    - esp32_ble_tracker.stop_scan:
-
-ota:
-  - platform: esphome
-  # password: ""
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  fast_connect: true
-
-button:
-  - platform: restart
-    name: Restart
-
-esp32_ble_tracker:
-  scan_parameters:
-    continuous: false
-
-bluetooth_proxy:
-  connection_slots: 3
-  active: true
 
 i2c:
   sda: GPIO5
@@ -58,16 +24,6 @@ i2c:
   frequency: 400kHz
 
 sensor:
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    id: wifi_rssi
-    update_interval: 60s
-
-  - platform: uptime
-    name: "Uptime"
-    id: uptime_s
-    update_interval: 60s
-
   - platform: bme280_i2c
     address: 0x76
     update_interval: 60s

@@ -1,6 +1,10 @@
+packages:
+  common-options: !include common.yaml
+
 substitutions:
-  name: ws-touch-lcd-154-s3
+  device_name: ws-touch-lcd-154-s3
   friendly_name: "Waveshare Touch LCD 1.54 ESP32-S3"
+  api_key: !secret ws-s3-touch-lcd-154-key
 
   loading_illustration_file: https://github.com/esphome/wake-word-voice-assistants/raw/main/casita/loading_320_240.png
   idle_illustration_file: https://github.com/esphome/wake-word-voice-assistants/raw/main/casita/idle_320_240.png
@@ -35,9 +39,6 @@ substitutions:
   # for Greek use "Noto Sans" for other languages use a compatible font family
   font_family: Figtree
 
-packages:
-  esphome-options: !include shared/esphome-options.yaml
-
 esphome:
   on_boot:
     priority: 600
@@ -54,8 +55,6 @@ esphome:
 esp32:
   variant: esp32s3
   flash_size: 16MB
-  framework:
-    type: esp-idf
 
 psram:
   mode: octal
@@ -66,27 +65,16 @@ logger:
   hardware_uart: USB_SERIAL_JTAG
 
 api:
-  encryption:
-    key: !secret ws-s3-touch-lcd-154-key
   on_client_connected:
     - script.execute: draw_display
   on_client_disconnected:
     - script.execute: draw_display
 
-ota:
-  - platform: esphome
-
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
   on_connect:
     - script.execute: draw_display
   on_disconnect:
     - script.execute: draw_display
-
-button:
-  - platform: restart
-    name: "Restart"
 
 binary_sensor:
   - platform: gpio

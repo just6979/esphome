@@ -1,9 +1,10 @@
-substitutions:
-  name: ws-epaper-154-s3
-  friendly_name: "Waveshare ePaper 1.54 ESP32-S3"
-
 packages:
-  esphome-options: !include shared/esphome-options.yaml
+  common-options: !include common.yaml
+
+substitutions:
+  device_name: ws-epaper-154-s3
+  friendly_name: "Waveshare ePaper 1.54 ESP32-S3"
+  api_key: !secret ws-tiny-epd-s3-key
 
 esphome:
   on_boot:
@@ -80,8 +81,6 @@ esphome:
 
 esp32:
   variant: ESP32S3
-  framework:
-    type: esp-idf
   flash_size: 8MB
   # run at min speed when awake since we're on battery
   cpu_frequency: 80MHz
@@ -91,12 +90,6 @@ psram:
   speed: 80MHz
   ignore_not_found: false
   
-logger:
-  level: DEBUG
-  
-api:
-  encryption:
-    key: !secret ws-tiny-epd-s3-key
 
 ota:
   - platform: esphome
@@ -109,9 +102,6 @@ wifi:
   use_psram: true
 
 button:
-  - platform: restart
-    name: "Restart"
-
   - platform: template
     name: "Refresh Display"
     on_press:
@@ -231,16 +221,6 @@ i2c:
   frequency: 50kHz
 
 sensor:
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    id: wifi_rssi
-    update_interval: 60s
-
-  - platform: uptime
-    name: "Uptime"
-    id: uptime_s
-    update_interval: 60s
-
   - platform: adc
     name: "Battery Voltage"
     pin: GPIO4

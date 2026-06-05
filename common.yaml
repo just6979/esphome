@@ -1,0 +1,44 @@
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  min_version: 2026.5.0
+  platformio_options:
+    upload_speed: 2000000
+  environment_variables:
+    PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
+
+esp32:
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+api:
+  encryption:
+    key: ${api_key}
+
+ota:
+  - platform: esphome
+    password: ${ota_key}
+
+button:
+  - platform: restart
+    name: Restart
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_rssi
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Uptime"
+    id: uptime_s
+    update_interval: 60s
+

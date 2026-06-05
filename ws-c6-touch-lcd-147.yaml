@@ -1,9 +1,7 @@
 substitutions:
   device_name: ws-touch-lcd-147-c6
   friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
-
-packages:
-  esphome-options: !include shared/esphome-options.yaml
+  api_key: !secret ws-touch-lcd-c6-key
 
 esphome:
   on_boot:
@@ -13,46 +11,7 @@ esphome:
 
 esp32:
   variant: ESP32C6
-  framework:
-    type: esp-idf
   flash_size: 8MB
-
-logger:
-  level: DEBUG
-
-api:
-  encryption:
-    key: !secret ws-touch-lcd-c6-key
-#  on_client_connected:
-#    - esp32_ble_tracker.start_scan:
-#        continuous: true
-#  on_client_disconnected:
-#    - esp32_ble_tracker.stop_scan:
-
-ota:
-  - platform: esphome
-  # password: ""
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  fast_connect: true
-
-#zigbee:
-#  id: ws_touch_lcd_c6
-#  router: true
-
-button:
-  - platform: restart
-    name: Restart
-
-#esp32_ble_tracker:
-#  scan_parameters:
-#    continuous: false
-#
-#bluetooth_proxy:
-#  connection_slots: 3
-#  active: true
 
 time:
   - platform: homeassistant
@@ -152,16 +111,6 @@ external_components:
     refresh: 0s
 
 sensor:
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    id: wifi_rssi
-    update_interval: 10s
-
-  - platform: uptime
-    name: "Uptime"
-    id: uptime_s
-    update_interval: 10s
-
 #  - platform: qmi8658
 #    address: 0x6B
 ##    interrupt_pin_1: GPIO5

@@ -1,3 +1,6 @@
+packages:
+  sm-cd-oled-base: !include sm-c3-oled-base.yaml
+
 substitutions:
   device_name: sm-c3-oled-b
   friendly_name: "SuperMini ESP32-C3 OLED B"
@@ -6,5 +9,11 @@ substitutions:
     - offset: 0.0
   bme_hum_filters:
     - offset: 0.0
-
-<<: !include sm-c3-oled-base.yaml
+#    - calibrate_polynomial:
+#        degree: 1
+#        datapoints:
+#          - 30.7 -> 51
+#          - 27.6 -> 49
+#          - 31.8 -> 53
+#          - 31.0 -> 52
+#          - 34.4 -> 55
