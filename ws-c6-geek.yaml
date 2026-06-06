@@ -48,6 +48,7 @@ light:
   - platform: monochromatic
     output: backlight_pin
     name: "Display Backlight"
+    disabled_by_default: true
     id: lcd_backlight
     icon: mdi:brightness-7
     restore_mode: RESTORE_AND_ON
@@ -97,7 +98,6 @@ binary_sensor:
       inverted: true
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
-    name: "Button"
     id: button1
     on_press:
       then:

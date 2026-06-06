@@ -46,8 +46,9 @@ power_supply:
 
 light:
   - platform: esp32_rmt_led_strip
-    name: "NeoPixel"
     id: neopixel
+    name: "NeoPixel"
+    disabled_by_default: true
     pin: GPIO39
     power_supply: neopixel_power
     num_leds: 1

@@ -134,6 +134,7 @@ light:
   - platform: status_led
     id: green_led
     name: "Green LED"
+    disabled_by_default: true
     pin:
       number: GPIO3
       inverted: true

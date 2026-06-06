@@ -99,6 +99,8 @@ switch:
 light:
   - platform: status_led
     id: light_status
+    name: "Status LED"
+    disabled_by_default: true
     pin:
       number: GPIO08
       inverted: true
