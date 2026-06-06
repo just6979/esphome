@@ -76,16 +76,21 @@ i2c:
     frequency: 400kHz
 
 sensor:
-  - platform: bme280_i2c
+  - platform: sht4x
     i2c_id: i2c_qt
-    address: 0x76
-    update_interval: 60s
+    heater_max_duty: 0.01
     temperature:
-      name: "Temperature"
-      id: bme_temp
+      name: "Temperature (SHT4X)"
+      id: sht_temp
     humidity:
       name: "Humidity"
-      id: bme_hum
+      id: sht_hum
+
+  - platform: spa06_i2c
+    i2c_id: i2c_qt
+    temperature:
+      name: "Temperature (SPA06)"
+      id: spa_temp
     pressure:
       name: "Pressure"
-      id: bme_pres
+      id: spa_pres
