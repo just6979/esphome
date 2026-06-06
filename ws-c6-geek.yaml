@@ -154,13 +154,15 @@ font:
 # ST7789 controller is 240×320; our panel is 135×240.
 # Portrait gaps: col 52|135|53 = 240, row 40|240|40 = 320
 display:
-  - platform: st7789v
-    model: Custom
+  - platform: mipi_spi
+    model: st7789v
     id: geek_display
-    width: 135
-    height: 240
-    offset_width: 52
-    offset_height: 40
+    dimensions:
+      width: 135
+      height: 240
+      offset_width: 52
+      offset_height: 40
+    invert_colors: true
     dc_pin: GPIO3
     reset_pin:
       number: GPIO4
@@ -168,7 +170,6 @@ display:
     cs_pin:
       number: GPIO5
       ignore_strapping_warning: true
-    backlight_pin: no        # controlled separately via LEDC light
     data_rate: 40MHz
     update_interval: 10s
     pages:
