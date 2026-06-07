@@ -82,8 +82,6 @@ esphome:
 esp32:
   variant: ESP32S3
   flash_size: 8MB
-  # run full speed when awake since we're on USB power
-  # cpu_frequency: 80MHz
 
 psram:
   mode: octal
@@ -102,23 +100,13 @@ wifi:
   use_psram: true
 
 button:
-  - platform: restart
-    name: "Restart"
-
   - platform: template
     name: "Refresh Display"
     on_press:
       - component.update: epaper_display
 
-# act as a bluetooth proxy when awake if we're on USB power
 esp32_ble:
   use_psram: true
-
-esp32_ble_tracker:
-
-bluetooth_proxy:
-  connection_slots: 5
-  active: true
 
 time:
   - platform: homeassistant
@@ -225,16 +213,6 @@ i2c:
   frequency: 50kHz
 
 sensor:
-  - platform: wifi_signal
-    name: "WiFi Signal"
-    id: wifi_rssi
-    update_interval: 60s
-
-  - platform: uptime
-    name: "Uptime"
-    id: uptime_s
-    update_interval: 60s
-
   - platform: adc
     name: "Battery Voltage"
     pin: GPIO4
@@ -341,7 +319,7 @@ display:
     busy_pin: GPIO8
     model: 1.54inv2
     # update the display automatically when staying awake
-    update_interval: 300s
+    update_interval: 5min
     full_update_every: 1
     rotation: 90
     lambda: |-

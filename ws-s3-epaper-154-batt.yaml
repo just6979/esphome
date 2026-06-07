@@ -107,15 +107,6 @@ button:
     on_press:
       - component.update: epaper_display
 
-# act as a bluetooth proxy when awake if we're on USB power
-#esp32_ble:
-#  use_psram: true
-#
-#esp32_ble_tracker:
-#
-#bluetooth_proxy:
-#  connection_slots: 5
-#  active: true
 
 time:
   - platform: homeassistant
@@ -328,7 +319,7 @@ display:
     busy_pin: GPIO8
     model: 1.54inv2
     # update the display automatically when staying awake
-    update_interval: 300s
+    update_interval: 5min
     full_update_every: 1
     rotation: 90
     lambda: |-
