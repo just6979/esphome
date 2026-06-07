@@ -75,6 +75,10 @@ sensor:
     id: backyard_hum
     entity_id: sensor.backyard_humidity
 
+  - platform: homeassistant
+    id: pool_temperature
+    entity_id: sensor.outside_pool_temperature
+
 text_sensor:
   - platform: wifi_info
     ip_address:
@@ -143,7 +147,13 @@ color:
 
 font:
   - file: "gfonts://Roboto"
+    id: font_xlarge
+    size: 40
+  - file: "gfonts://Roboto"
     id: font_large
+    size: 30
+  - file: "gfonts://Roboto"
+    id: font_medium
     size: 20
   - file: "gfonts://Roboto"
     id: font_small
@@ -173,6 +183,26 @@ display:
     data_rate: 40MHz
     update_interval: 10s
     pages:
+      - id: page_pool
+        lambda: |-
+          float pool_fht = (id(pool_temperature).state * 9 / 5) + 32;
+          ESP_LOGD("pool", "Pool: %.1f°F", id(pool_temperature).state);
+
+          it.fill(id(color_black));
+
+          if (id(wifi_ssid).state != "") {
+            it.print(67, 5, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "Pool");
+            it.printf(67, 45, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "%.1f°F", id(pool_temperature).state);
+
+            it.printf(67, 115, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
+            it.printf(67, 140, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", id(backyard_temp).state);
+            it.printf(67, 165, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(backyard_hum).state);
+          } else {
+            it.print(67, 140, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
+
+          it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2/3");
+
       - id: page_climate
         lambda: |-
           float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
@@ -182,37 +212,37 @@ display:
 
           it.fill(id(color_black));
 
-          it.printf(67, 5, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Indoors");
-          it.printf(67, 30, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", temp_fht);
-          it.printf(67, 55, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", hum);
-          it.printf(67, 80, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", pres);
+          it.printf(67, 5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Indoors");
+          it.printf(67, 30, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", temp_fht);
+          it.printf(67, 55, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", hum);
+          it.printf(67, 80, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", pres);
 
-          it.printf(67, 115, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Backyard");
+          it.printf(67, 115, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
           if (id(wifi_ssid).state != "") {
-            it.printf(67, 140, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", id(backyard_temp).state);
-            it.printf(67, 165, id(font_large), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(backyard_hum).state);
+            it.printf(67, 140, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f° F", id(backyard_temp).state);
+            it.printf(67, 165, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%% RH", id(backyard_hum).state);
           } else {
-            it.print(67, 140, id(font_large), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+            it.print(67, 140, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
           }
 
-          it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 1/2");
+          it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2/3");
 
       - id: page_status
         lambda: |-
           it.fill(id(color_bg_blue));
 
-          it.print(67, 5, id(font_large), id(color_blue), TextAlign::TOP_CENTER, "Network");
+          it.print(67, 5, id(font_medium), id(color_blue), TextAlign::TOP_CENTER, "Network");
 
           if (id(wifi_ssid).state != "") {
             it.printf(67, 35, id(font_small), id(color_white), TextAlign::TOP_CENTER, "%s", id(wifi_ssid).state.c_str());
             it.printf(67, 55, id(font_small), id(color_green), TextAlign::TOP_CENTER, "%s", id(wifi_ip).state.c_str());
             it.printf(67, 75, id(font_small), id(color_yellow), TextAlign::TOP_CENTER, "%.0f dBm", id(wifi_rssi).state);
           } else {
-            it.print(67, 55, id(font_large), id(color_red), TextAlign::TOP_CENTER, "Connecting...");
+            it.print(67, 55, id(font_medium), id(color_red), TextAlign::TOP_CENTER, "Connecting...");
           }
 
-          it.print(67, 110, id(font_large), id(color_orange), TextAlign::TOP_CENTER, "System");
+          it.print(67, 110, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "System");
           it.printf(67, 140, id(font_small), id(color_white), TextAlign::TOP_CENTER, "%d KB Free", esp_get_free_heap_size() / 1024);
           it.printf(67, 160, id(font_small), id(color_green), TextAlign::TOP_CENTER, "%.0fs Uptime", id(uptime_s).state);
 
-          it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2/2");
+          it.printf(120, 230, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 3/3");
