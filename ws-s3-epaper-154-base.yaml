@@ -111,16 +111,29 @@ time:
     update_interval: never
 
 light:
-  - platform: status_led
+#  - platform: status_led
+#    id: green_led
+#    name: "Green LED"
+#    disabled_by_default: true
+#    pin:
+#      number: GPIO3
+#      inverted: true
+#      ignore_strapping_warning: true
+
+  - platform: monochromatic
     id: green_led
     name: "Green LED"
     disabled_by_default: true
+    output: gpio_3
+
+output:
+  - platform: ledc
     pin:
       number: GPIO3
       inverted: true
       ignore_strapping_warning: true
+    id: gpio_3
 
-output:
   - platform: gpio
     pin: GPIO6
     id: epd_power
