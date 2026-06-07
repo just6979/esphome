@@ -120,6 +120,13 @@ light:
       inverted: true
       ignore_strapping_warning: true
 
+output:
+  - platform: gpio
+    pin: GPIO6
+    id: epd_power
+    inverted: false
+
+
 globals:
   - id: stay_awake
     type: bool
@@ -291,12 +298,6 @@ spi:
   clk_pin: GPIO12
   mosi_pin: GPIO13
   interface: hardware
-
-output:
-  - platform: gpio
-    pin: GPIO6
-    id: epd_power
-    inverted: false 
 
 display:
   - platform: waveshare_epaper
