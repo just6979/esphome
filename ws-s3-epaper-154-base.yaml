@@ -228,6 +228,20 @@ i2c:
   frequency: 50kHz
 
 sensor:
+  - platform: template
+    name: "Wakeup Cause"
+    accuracy_decimals: 0
+    lambda: |-
+      int pin;
+      if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_EXT1) {
+        pin = esp_sleep_get_ext1_wakeup_status();
+        if (pin && 1) {
+          id(stay_awake_switch).turn_on();
+        }
+        return 0;
+      } else {
+        return -1;
+      }
   - platform: adc
     name: "Battery Voltage"
     pin: GPIO4
