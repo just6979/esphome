@@ -162,19 +162,19 @@ switch:
         return false;
       }
     turn_on_action:
+      - deep_sleep.prevent: deep_sleep_1
       - lambda: |-
           id(stay_awake) = true;
           id(wake_status) = "Awake";
       - logger.log: "Staying Awake"
-      - deep_sleep.prevent: deep_sleep_1
       - component.update: epaper_display
     turn_off_action:
       - lambda: |-
           id(stay_awake) = false;
           id(wake_status) = "Sleepy";
       - logger.log: "Getting Sleepy"
-      - deep_sleep.allow: deep_sleep_1
       - component.update: epaper_display
+      - deep_sleep.allow: deep_sleep_1
 
 binary_sensor:
   - platform: gpio
