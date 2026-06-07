@@ -167,12 +167,15 @@ switch:
           id(stay_awake) = true;
           id(wake_status) = "Awake";
       - logger.log: "Staying Awake"
+      - esp32_ble_tracker.start_scan:
+          continuous: true
       - component.update: epaper_display
     turn_off_action:
       - lambda: |-
           id(stay_awake) = false;
           id(wake_status) = "Sleepy";
       - logger.log: "Getting Sleepy"
+      - esp32_ble_tracker.stop_scan:
       - component.update: epaper_display
       - deep_sleep.allow: deep_sleep_1
 
