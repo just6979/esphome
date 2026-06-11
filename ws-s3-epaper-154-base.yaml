@@ -90,7 +90,6 @@ psram:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  fast_connect: true
   use_psram: true
 
 button:
@@ -196,7 +195,6 @@ deep_sleep:
   id: deep_sleep_1
   run_duration:
     default: 60s
-    gpio_wakeup_reason: 60s
   sleep_duration: 60min
   esp32_ext1_wakeup:
     pins:
@@ -234,14 +232,12 @@ sensor:
       }
 
   - platform: shtcx
-    address: 0x70
-    update_interval: 60s
     temperature:
       name: "Temperature"
-      id: sht_temp
+      id: temperature
     humidity:
       name: "Humidity"
-      id: sht_hum
+      id: humidity
 
   - platform: homeassistant
     id: backyard_temperature
@@ -290,9 +286,6 @@ speaker:
 
 font:
   - file: "gfonts://Roboto"
-    id: roboto_16
-    size: 16
-  - file: "gfonts://Roboto"
     id: roboto_20
     size: 20
   - file: "gfonts://Roboto"
@@ -301,9 +294,6 @@ font:
   - file: "gfonts://Roboto"
     id: roboto_40
     size: 40
-  - file: "gfonts://Roboto"
-    id: roboto_60
-    size: 60
 
 spi:
   clk_pin: GPIO12
