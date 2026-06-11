@@ -108,8 +108,8 @@ time:
 #    update_interval: never
 
 light:
-  - platform: status_led
-#  - platform: monochromatic
+#  - platform: status_led
+  - platform: monochromatic
     id: green_led
     name: "Green LED"
     restore_mode: RESTORE_DEFAULT_ON
