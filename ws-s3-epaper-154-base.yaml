@@ -317,16 +317,31 @@ sensor:
 
 font:
   - file: "gfonts://Roboto"
-    id: roboto_20
+    id: font_xsmall
+    size: 16
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 20
+  - file: "gfonts://Knewave"
+    id: font_fancy_small
     size: 20
   - file: "gfonts://Roboto"
-    id: roboto_24
+    id: font_medium
+    size: 24
+  - file: "gfonts://Knewave"
+    id: font_fancy_medium
     size: 24
   - file: "gfonts://Roboto"
-    id: roboto_32
+    id: font_large
+    size: 32
+  - file: "gfonts://Knewave"
+    id: font_fancy_large
     size: 32
   - file: "gfonts://Roboto"
-    id: roboto_48
+    id: font_xxlarge
+    size: 48
+  - file: "gfonts://Knewave"
+    id: font_fancy_xxlarge
     size: 48
 
 spi:
@@ -367,37 +382,37 @@ display:
 
       it.fill(COLOR_OFF);
 
-      it.print(middle, top1, id(roboto_20), COLOR_ON, TextAlign::TOP_CENTER, "Back Yard");
-      it.printf(left + 10, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(backyard_temperature).state);
-      it.printf(right - 10, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(backyard_humidity).state);
-              
-      it.print(middle, top3, id(roboto_32), COLOR_ON, TextAlign::TOP_CENTER, "Pool");
-      it.printf(middle, top4 + 3, id(roboto_48), COLOR_ON, TextAlign::TOP_CENTER, "%.1f°F", id(pool_temperature).state);
+      it.print(middle, top1, id(font_fancy_small), COLOR_ON, TextAlign::TOP_CENTER, "Back Yard");
+      it.printf(left + 10, top2, id(font_fancy_medium), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(backyard_temperature).state);
+      it.printf(right - 10, top2, id(font_fancy_medium), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(backyard_humidity).state);
+      
+      it.print(middle, top3, id(font_fancy_large), COLOR_ON, TextAlign::TOP_CENTER, "Pool");
+      it.printf(middle, top4 + 3, id(font_fancy_xxlarge), COLOR_ON, TextAlign::TOP_CENTER, "%.1f°F", id(pool_temperature).state);
 
       if (id(ha_time).now().is_valid()) {
-        it.strftime(left, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "%H:%M", id(ha_time).now());
-        it.strftime(left, bot1, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "%Y-%m-%d", id(ha_time).now());
+        it.strftime(left, bot2, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_LEFT, "%H:%M", id(ha_time).now());
+        it.strftime(left, bot1, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_LEFT, "%Y-%m-%d", id(ha_time).now());
       } else {
-        it.print(left, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Time?");
-        it.print(left, bot1, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Date?");
+        it.print(left, bot2, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Time?");
+        it.print(left, bot1, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_LEFT, "?Date?");
       }
 
-      it.print(right, bot3, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, id(wake_status).c_str());
+      it.print(right, bot3, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_RIGHT, id(wake_status).c_str());
       if (id(battery_voltage).has_state()) {
         float v = id(battery_voltage).state;
-        it.printf(right, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f V", v);
+        it.printf(right, bot2, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%.2f V", v);
         // Map 3.2V (0%) to 4.1V (100%)
         float bat_min = 3.2;
         float bat_max = 4.1;
         int bat_pct = (int)((v - bat_min) / (bat_max - bat_min) * 100.0);
         // Show "LOW%" if 10% or under, otherwise show normal percentage
         if (bat_pct <= 10) {
-          it.print(right, bot1, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "LOW%");
+          it.print(right, bot1, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_RIGHT, "LOW%");
         } else {
-          it.printf(right, bot1, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%d%%", bat_pct);
+          it.printf(right, bot1, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_RIGHT, "%d%%", bat_pct);
         }
       } else {
-        it.print(right, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?.??V");
-        it.print(right, bot1, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "??%");
+        it.print(right, bot2, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?.??V");
+        it.print(right, bot1, id(font_xsmall), COLOR_ON, TextAlign::BOTTOM_RIGHT, "??%");
       }
       id(epd_power).turn_off();
