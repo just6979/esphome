@@ -7,9 +7,19 @@ substitutions:
   friendly_name: "Waveshare ESP32-S3 ePaper 1.54 Battery"
   api_key: !secret ws-s3-epaper-154-key
 
-esp32:
-  cpu_frequency: 80MHz
-
 globals:
   - id: !extend stay_awake
     initial_value: "false"
+
+esp32:
+  cpu_frequency: 80MHz
+
+sensor:
+  - platform: adc
+    id: battery_voltage
+    name: "Battery Voltage"
+    pin: GPIO4
+    accuracy_decimals: 2
+    attenuation: auto
+    filters:
+      - multiply: 2.0

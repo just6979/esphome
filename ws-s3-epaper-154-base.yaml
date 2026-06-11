@@ -232,15 +232,6 @@ sensor:
       } else {
         return -1;
       }
-  - platform: adc
-    name: "Battery Voltage"
-    pin: GPIO4
-    id: battery_voltage
-    accuracy_decimals: 2
-    update_interval: 60s
-    attenuation: auto
-    filters:
-      - multiply: 2.0
 
   - platform: shtcx
     address: 0x70
