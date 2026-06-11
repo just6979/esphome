@@ -52,7 +52,6 @@ esphome:
       - delay: 2s
 
       # UPDATE DISPLAY & SLEEP
-      - light.turn_on: green_led
       - component.update: epaper_display
   #      - delay: 30s
   #      - if:
@@ -111,18 +110,11 @@ time:
     update_interval: never
 
 light:
-#  - platform: status_led
-#    id: green_led
-#    name: "Green LED"
-#    disabled_by_default: true
-#    pin:
-#      number: GPIO3
-#      inverted: true
-#      ignore_strapping_warning: true
-
-  - platform: monochromatic
+  - platform: status_led
+#  - platform: monochromatic
     id: green_led
     name: "Green LED"
+    restore_mode: RESTORE_DEFAULT_ON
     disabled_by_default: true
     output: gpio_3
 
