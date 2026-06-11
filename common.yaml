@@ -42,3 +42,8 @@ sensor:
     id: uptime_s
     update_interval: 60s
 
+script:
+  - id: ble_start_scan
+    then:
+  - id: ble_stop_scan
+    then:

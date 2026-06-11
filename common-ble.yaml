@@ -15,3 +15,12 @@ esp32_ble_tracker:
     continuous: false
 
 bluetooth_proxy:
+
+script:
+  - id: !extend ble_start_scan
+    then:
+      - esp32_ble_tracker.start_scan:
+          continuous: true
+  - id: !extend ble_stop_scan
+    then:
+      - esp32_ble_tracker.stop_scan:
