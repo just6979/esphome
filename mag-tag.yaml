@@ -1,0 +1,277 @@
+packages:
+  common-options: !include common.yaml
+
+substitutions:
+  device_name: mag-tag
+  friendly_name: "Adafruit Mag-Tag"
+  api_key: !secret mag-tag-key
+
+esphome:
+  on_boot:
+    priority: 800
+    then:
+    - wait_until:
+        condition:
+          and:
+            - api.connected:
+            - lambda: 'return id(ha_time).now().is_valid();'
+        timeout: 30s
+    - component.update: epaper_display
+
+esp32:
+  variant: ESP32S2
+  flash_size: 4MB
+
+psram:
+  speed: 80MHz
+  ignore_not_found: false
+
+wifi:
+  use_psram: true
+
+button:
+  - platform: template
+    name: "Refresh Display"
+    on_press:
+      - component.update: epaper_display
+
+globals:
+  - id: stay_awake
+    type: bool
+    restore_value: yes
+    initial_value: "false"
+  - id: wake_status
+    type: std::string
+    restore_value: yes
+    initial_value: '"Awake"'
+
+switch:
+  - platform: template
+    id: stay_awake_switch
+    name: "Stay Awake"
+    restore_mode: RESTORE_DEFAULT_OFF
+    lambda: |-
+      if (id(stay_awake)) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - deep_sleep.prevent: deep_sleep_1
+      - lambda: |-
+          id(stay_awake) = true;
+          id(wake_status) = "Awake";
+      - logger.log: "Staying Awake"
+      - component.update: epaper_display
+    turn_off_action:
+      - lambda: |-
+          id(stay_awake) = false;
+          id(wake_status) = "Sleepy";
+      - logger.log: "Getting Sleepy"
+      - component.update: epaper_display
+      - deep_sleep.allow: deep_sleep_1
+
+time:
+  - platform: homeassistant
+    id: ha_time
+
+power_supply:
+  - id: 'neopixel_power'
+    pin:
+      number: GPIO21
+      inverted: true
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: neopixels
+    name: "MagTag NeoPixels"
+    pin: GPIO1
+    power_supply: neopixel_power
+    num_leds: 4
+    chipset: WS2812
+    rgb_order: GRB
+    initial_state:
+      brightness: 25%
+    effects:
+      - addressable_rainbow:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+
+    restore_mode: RESTORE_DEFAULT_OFF
+    disabled_by_default: true
+
+#  - platform: status_led
+#    id: red_led
+#    name: "Red LED"
+#    pin: GPIO13
+#    disabled_by_default: true
+
+  - platform: monochromatic
+    id: red_led
+    name: "Red LED"
+    output: gpio_13
+    restore_mode: RESTORE_DEFAULT_OFF
+    disabled_by_default: true
+
+output:
+  - platform: ledc
+    pin: GPIO13
+    id: gpio_13
+
+  - platform: gpio
+    pin: GPIO16
+    id: speaker_enable
+
+  - platform: gpio
+    pin: GPIO17
+    id: speaker
+
+binary_sensor:
+  - platform: gpio
+    id: button_boot
+    pin:
+      number: GPIO0
+      inverted: true
+      mode: INPUT_PULLUP
+      ignore_strapping_warning: true
+      allow_other_uses: true
+  - platform: gpio
+    pin:
+      number: GPIO15
+      inverted: true
+      allow_other_uses: true
+    id: button_a
+  - platform: gpio
+    pin:
+      number: GPIO14
+      inverted: true
+      allow_other_uses: true
+    id: button_b
+  - platform: gpio
+    pin:
+      number: GPIO12
+      inverted: true
+      allow_other_uses: true
+    id: button_c
+  - platform: gpio
+    pin:
+      number: GPIO11
+      inverted: true
+      allow_other_uses: true
+    id: button_d
+
+deep_sleep:
+  id: deep_sleep_1
+  run_duration:
+    default: 60s
+  sleep_duration: 60min
+  esp32_ext1_wakeup:
+    pins:
+      - number: GPIO0
+        inverted: true
+        mode: INPUT_PULLUP
+        allow_other_uses: true
+        ignore_strapping_warning: true
+      - number: GPIO11
+        inverted: true
+        mode: INPUT_PULLUP
+        allow_other_uses: true
+      - number: GPIO12
+        inverted: true
+        mode: INPUT_PULLUP
+        allow_other_uses: true
+      - number: GPIO14
+        inverted: true
+        mode: INPUT_PULLUP
+        allow_other_uses: true
+      - number: GPIO15
+        inverted: true
+        mode: INPUT_PULLUP
+        allow_other_uses: true
+    mode: ANY_LOW
+
+i2c:
+  sda: GPIO33
+  scl: GPIO34
+  scan: true
+  frequency: 400kHz
+
+sensor:
+  - platform: adc
+    id: battery_voltage
+    name: "Battery Voltage"
+    pin: GPIO4
+    accuracy_decimals: 2
+    update_interval: 60s
+    attenuation: auto
+    filters:
+      - multiply: 2.0
+
+  - platform: sht4x
+    heater_max_duty: 0.01
+    temperature:
+      id: temperature_sht4x
+      name: "Temperature (SHT4X)"
+    humidity:
+      id: humidity
+      name: "Humidity"
+
+  - platform: spa06_i2c
+    temperature:
+      id: temperature_spa06
+      name: "Temperature (SPA06)"
+    pressure:
+      id: pressure
+      name: "Pressure"
+
+  - platform: homeassistant
+    id: backyard_temperature
+    entity_id: sensor.backyard_temperature
+
+  - platform: homeassistant
+    id: backyard_humidity
+    entity_id: sensor.backyard_humidity
+
+  - platform: homeassistant
+    id: pool_temperature
+    entity_id: sensor.outside_pool_temperature
+
+font:
+  - file: "gfonts://Roboto"
+    id: roboto_16
+    size: 16
+  - file: "gfonts://Roboto"
+    id: roboto_20
+    size: 20
+  - file: "gfonts://Roboto"
+    id: roboto_24
+    size: 24
+  - file: "gfonts://Roboto"
+    id: roboto_40
+    size: 40
+  - file: "gfonts://Roboto"
+    id: roboto_60
+    size: 60
+
+spi:
+  mosi_pin: GPIO35
+  clk_pin: GPIO36
+  miso_pin: GPIO37
+
+display:
+  - platform: waveshare_epaper
+    id: epaper_display
+#    model: 2.90in
+    model: 2.90in-b
+#    model: gdew029t5
+    cs_pin: GPIO8
+    dc_pin: GPIO7
+    reset_pin: GPIO6
+    busy_pin: GPIO5
+    update_interval: never
+#    full_update_every: 1
+    lambda: |-
+      it.printf(0, 0, id(roboto_40), "MagTag Connected!");
