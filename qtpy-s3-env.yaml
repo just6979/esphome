@@ -3,7 +3,7 @@ packages:
 
 substitutions:
   device_name: qtpy-s3-env
-  friendly_name: "QT-Py S3 + Env"
+  friendly_name: "QT-Py ESP32-S3 + Env Sensors"
   api_key: !secret qtpy-s3-env-key
 
 esphome:

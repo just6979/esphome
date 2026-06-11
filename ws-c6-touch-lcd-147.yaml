@@ -1,6 +1,6 @@
 substitutions:
   device_name: ws-c6-touch-lcd-147
-  friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
+  friendly_name: "Waveshare ESP32-C6 Touch LCD 1.47"
   api_key: !secret ws-c6-touch-lcd-147-key
 
 esphome:
