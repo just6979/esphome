@@ -7,7 +7,7 @@
 #substitutions:
 #  device_name: ws-epaper-154-s3
 #  friendly_name: "Waveshare ePaper 1.54 ESP32-S3 Base"
-#  api_key: !secret ws-tiny-epd-s3-key
+#  api_key: !secret ws-s3-epaper-154-key
 
 esphome:
   on_boot:

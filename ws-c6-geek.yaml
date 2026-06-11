@@ -4,7 +4,7 @@ packages:
 substitutions:
   device_name: ws-geek-c6
   friendly_name: "Waveshare Geek ESP32-C6"
-  api_key: !secret ws-geek-c6-key
+  api_key: !secret ws-c6-geek-key
 
 esphome:
   on_boot:

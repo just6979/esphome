@@ -5,7 +5,7 @@ packages:
 substitutions:
   device_name: ws-epaper-154-s3-usb
   friendly_name: "Waveshare ESP32-S3 ePaper 1.54 USB"
-  api_key: !secret ws-tiny-epd-s3-key
+  api_key: !secret ws-s3-epaper-154-key
 
 globals:
   - id: !extend stay_awake
