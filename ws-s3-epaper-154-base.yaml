@@ -13,7 +13,7 @@ esphome:
   on_boot:
     priority: 800
     then:
-      - pcf85063.read_time:
+#      - pcf85063.read_time:
       - lambda: |-
           // --- A. POWER LATCH (GPIO 17) ---
           // This board uses an "Active High" power circuit. If we don't lock 
@@ -102,12 +102,11 @@ button:
 time:
   - platform: homeassistant
     id: ha_time
-    on_time_sync:
-      - pcf85063.write_time
-  - platform: pcf85063
-    id: pcf85063_time
-    address: 0x51
-    update_interval: never
+#    on_time_sync:
+#      - pcf85063.write_time
+#  - platform: pcf85063
+#    id: pcf85063_time
+#    update_interval: never
 
 light:
   - platform: status_led
