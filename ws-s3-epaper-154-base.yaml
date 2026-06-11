@@ -35,7 +35,7 @@ esphome:
       
 
       # ENABLE PERIPHERALS
-      - output.turn_on: epd_power
+#      - output.turn_on: epd_power
       - delay: 100ms # Give the screen hardware a moment to boot up
 
       # WAIT FOR DATA (Sensors & Time)
@@ -323,6 +323,7 @@ display:
     full_update_every: 1
     rotation: 90
     lambda: |-
+      id(epd_power).turn_on();
       int top1 = 0;
       int top2 = 20;
       int top3 = 50;
@@ -370,3 +371,4 @@ display:
         it.print(right, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "?.??V");
         it.print(right, bot1, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_RIGHT, "??%");
       }
+      id(epd_power).turn_off();
