@@ -146,13 +146,13 @@ color:
     blue: 25%
 
 font:
-  - file: "gfonts://Roboto"
+  - file: "gfonts://Knewave"
     id: font_xlarge
     size: 40
-  - file: "gfonts://Roboto"
+  - file: "gfonts://Knewave"
     id: font_large
     size: 30
-  - file: "gfonts://Roboto"
+  - file: "gfonts://Knewave"
     id: font_medium
     size: 20
   - file: "gfonts://Roboto"
