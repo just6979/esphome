@@ -250,38 +250,49 @@ sensor:
     id: pool_temperature
     entity_id: sensor.outside_pool_temperature
 
-i2s_audio:
-  - id: i2s_audio_bus
-    i2s_lrclk_pin: GPIO38
-    i2s_bclk_pin: GPIO15
-    i2s_mclk_pin: GPIO14
-
-audio_dac:
-  - platform: es8311
-    id: es8311_dac
-    bits_per_sample: 16bit
-    sample_rate: 48000
-
-microphone:
-  - platform: i2s_audio
-    id: mic
-    sample_rate: 16000
-    i2s_din_pin:
-      number: GPIO45
-      ignore_strapping_warning: true
-    bits_per_sample: 16bit
-    adc_type: external
-
-speaker:
-  - platform: i2s_audio
-    id: spkr
-    i2s_dout_pin: GPIO16
-    dac_type: external
-    sample_rate: 48000
-    bits_per_sample: 16bit
-    channel: left
-    audio_dac: es8311_dac
-    buffer_duration: 100ms
+#i2s_audio:
+#  i2s_lrclk_pin: GPIO38
+#  i2s_bclk_pin: GPIO15
+#  i2s_mclk_pin: GPIO14
+#
+#audio_dac:
+#  - platform: es8311
+#    id: es8311_dac
+#    bits_per_sample: 16bit
+#    sample_rate: 48000
+#
+#microphone:
+#  - platform: i2s_audio
+#    id: the_mic
+#    adc_type: external
+#    i2s_din_pin:
+#      number: GPIO45
+#      ignore_strapping_warning: true
+#    sample_rate: 16000
+#    bits_per_sample: 16bit
+#
+#speaker:
+#  - platform: i2s_audio
+#    id: the_speaker
+#    i2s_dout_pin: GPIO16
+#    dac_type: external
+#    audio_dac: es8311_dac
+#    sample_rate: 48000
+#
+#  - platform: mixer
+#    output_speaker: the_speaker
+#    source_speakers:
+#      - id: announcement_mixer
+#      - id: media_mixer
+#
+#media_player:
+#  - platform: speaker
+#    id: the_media_player
+#    name: "Media Player"
+#    announcement_pipeline:
+#      speaker: announcement_mixer
+#    media_pipeline:
+#      speaker: media_mixer
 
 font:
   - file: "gfonts://Roboto"
