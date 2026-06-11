@@ -2,8 +2,8 @@ packages:
   common-options: !include common.yaml
 
 substitutions:
-  device_name: ws-touch-lcd-154-s3
-  friendly_name: "Waveshare Touch LCD 1.54 ESP32-S3"
+  device_name: ws-s3-touch-lcd-154
+  friendly_name: "Waveshare ESP32-S3 Touch LCD 1.54"
   api_key: !secret ws-s3-touch-lcd-154-key
 
   loading_illustration_file: https://github.com/esphome/wake-word-voice-assistants/raw/main/casita/loading_320_240.png

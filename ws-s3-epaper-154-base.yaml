@@ -1,12 +1,12 @@
-# !include this file along with one of the common configs and substitutions shown below
+# !include this file along with one of the common configs and all the substitutions shown below
 
 #packages:
 #  common-options: !include common.yaml
 #  common-options: !include common-ble.yaml
 #  ws-s3-epaper: !include ws-s3-epaper-154-base.yaml
 #substitutions:
-#  device_name: ws-epaper-154-s3
-#  friendly_name: "Waveshare ePaper 1.54 ESP32-S3 Base"
+#  device_name: ws-s3-epaper-154
+#  friendly_name: "Waveshare ESP32-S3 ePaper 1.54 Base"
 #  api_key: !secret ws-s3-epaper-154-key
 
 esphome:
@@ -138,7 +138,6 @@ output:
     pin: GPIO6
     id: epd_power
     inverted: false
-
 
 globals:
   - id: stay_awake

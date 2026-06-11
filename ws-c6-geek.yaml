@@ -2,8 +2,8 @@ packages:
   common-options: !include common-ble.yaml
 
 substitutions:
-  device_name: ws-geek-c6
-  friendly_name: "Waveshare Geek ESP32-C6"
+  device_name: ws-c6-geek
+  friendly_name: "Waveshare ESP32-C6 Geek"
   api_key: !secret ws-c6-geek-key
 
 esphome:
