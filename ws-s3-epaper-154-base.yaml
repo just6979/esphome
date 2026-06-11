@@ -228,7 +228,7 @@ i2c:
 
 sensor:
   - platform: template
-    name: "Wakeup Cause"
+    id: wakeup_cause
     accuracy_decimals: 0
     lambda: |-
       int pin;
