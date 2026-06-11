@@ -140,6 +140,27 @@ globals:
     initial_value: '"Awake"'
 
 switch:
+#  - platform: gpio
+#    id: pa_enable
+#    name: "Speaker Power"
+#    pin:
+#      number: GPIO42
+#      mode:
+#        output: true
+#        pulldown: true
+#      inverted: true
+#
+#  - platform: gpio
+#    id: pa_control
+#    name: "Speaker Enable"
+#    pin:
+#      number: GPIO46
+#      mode:
+#        output: true
+#        pullup: true
+#      inverted: true
+#      ignore_strapping_warning: true
+
   - platform: template
     id: stay_awake_switch
     name: "Stay Awake"
