@@ -319,7 +319,7 @@ display:
     busy_pin: GPIO8
     model: 1.54inv2
     # update the display automatically when staying awake
-    update_interval: 5min
+    update_interval: 15min
     full_update_every: 1
     rotation: 90
     lambda: |-
