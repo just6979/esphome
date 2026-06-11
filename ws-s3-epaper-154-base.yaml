@@ -323,8 +323,11 @@ font:
     id: roboto_24
     size: 24
   - file: "gfonts://Roboto"
-    id: roboto_40
-    size: 40
+    id: roboto_32
+    size: 32
+  - file: "gfonts://Roboto"
+    id: roboto_48
+    size: 48
 
 spi:
   - id: spi_display
@@ -354,7 +357,7 @@ display:
       int top1 = 0;
       int top2 = 20;
       int top3 = 50;
-      int top4 = 70;
+      int top4 = 80;
       int bot3 = 160;
       int bot2 = 180;
       int bot1 = 200;
@@ -368,8 +371,8 @@ display:
       it.printf(left + 10, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°F", id(backyard_temperature).state);
       it.printf(right - 10, top2, id(roboto_24), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%RH", id(backyard_humidity).state);
               
-      it.print(middle, top3, id(roboto_24), COLOR_ON, TextAlign::TOP_CENTER, "Pool");
-      it.printf(middle, top4 + 3, id(roboto_40), COLOR_ON, TextAlign::TOP_CENTER, "%.1f°F", id(pool_temperature).state);
+      it.print(middle, top3, id(roboto_32), COLOR_ON, TextAlign::TOP_CENTER, "Pool");
+      it.printf(middle, top4 + 3, id(roboto_48), COLOR_ON, TextAlign::TOP_CENTER, "%.1f°F", id(pool_temperature).state);
 
       if (id(ha_time).now().is_valid()) {
         it.strftime(left, bot2, id(roboto_20), COLOR_ON, TextAlign::BOTTOM_LEFT, "%H:%M", id(ha_time).now());
