@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ESPHome Logs OTA" type="CLionNativeAppRunConfigurationType" focusToolWindowBeforeRun="true" PROGRAM_PARAMS="logs --device OTA $FileName$" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$ContentRoot$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="esphome" TARGET_NAME="ESPHome" CONFIG_NAME="ESPHome" version="1" RUN_PATH="$PROJECT_DIR$/../.local/bin/esphome">
+  <configuration default="false" name="ESPHome Logs OTA" type="CLionNativeAppRunConfigurationType" focusToolWindowBeforeRun="true" PROGRAM_PARAMS="logs --device OTA $FileName$" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$ContentRoot$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="esphome" TARGET_NAME="ESPHome" CONFIG_NAME="ESPHome" version="1" RUN_PATH="$USER_HOME$/.local/bin/esphome">
     <method v="2" />
   </configuration>
 </component>
