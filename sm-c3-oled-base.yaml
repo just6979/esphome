@@ -66,11 +66,7 @@ switch:
     name: "Display"
     restore_mode: RESTORE_DEFAULT_ON
     lambda: |-
-      if (id(display_on)) {
-        return true;
-      } else {
-        return false;
-      }
+      return id(display_on);
     turn_on_action:
       - lambda: |-
           id(display_on) = true;
