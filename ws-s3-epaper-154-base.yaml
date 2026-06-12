@@ -316,33 +316,57 @@ sensor:
 #      speaker: media_mixer
 
 font:
-  - file: "gfonts://Roboto"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: 600
     id: font_xsmall
     size: 16
-  - file: "gfonts://Roboto"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: 600
     id: font_small
     size: 20
-  - file: "gfonts://Knewave"
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
     id: font_fancy_small
     size: 20
-  - file: "gfonts://Roboto"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: 600
     id: font_medium
     size: 24
-  - file: "gfonts://Knewave"
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
     id: font_fancy_medium
     size: 24
-  - file: "gfonts://Roboto"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: 500
     id: font_large
     size: 32
-  - file: "gfonts://Knewave"
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
     id: font_fancy_large
-    size: 32
+    size: 38
   - file: "gfonts://Roboto"
     id: font_xxlarge
-    size: 48
-  - file: "gfonts://Knewave"
+    size: 52
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
     id: font_fancy_xxlarge
-    size: 48
+    size: 52
 
 spi:
   - id: spi_display
@@ -377,7 +401,7 @@ display:
 
       it.fill(COLOR_OFF);
 
-      it.print(middle, middle, id(font_xxlarge), COLOR_ON, TextAlign::CENTER, "Hello");
+      it.print(middle, middle, id(font_fancy_xxlarge), COLOR_ON, TextAlign::CENTER, "Hello");
 
       if (id(ha_time).now().is_valid()) {
         it.strftime(left, bot2, id(font_small), COLOR_ON, TextAlign::BOTTOM_LEFT, "%H:%M", id(ha_time).now());
