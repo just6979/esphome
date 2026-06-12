@@ -241,13 +241,13 @@ sensor:
 
 font:
   - file: "gfonts://Roboto"
-    id: roboto_16
+    id: font_xsmall
     size: 16
   - file: "gfonts://Roboto"
-    id: roboto_20
+    id: font_small
     size: 20
   - file: "gfonts://Roboto"
-    id: roboto_24
+    id: font_medium
     size: 24
   - file: "gfonts://Roboto"
     id: roboto_40
