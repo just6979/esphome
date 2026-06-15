@@ -10,12 +10,16 @@ esphome:
   on_boot:
     priority: 800
     then:
+    - component.update: epaper_display
     - wait_until:
         condition:
           and:
             - api.connected:
             - lambda: 'return id(ha_time).now().is_valid();'
         timeout: 30s
+    - globals.set:
+        id: initialized
+        value: 'true'
     - component.update: epaper_display
 
 esp32:
@@ -36,6 +40,10 @@ button:
       - component.update: epaper_display
 
 globals:
+  - id: initialized
+    type: bool
+    restore_value: no
+    initial_value: "false"
   - id: stay_awake
     type: bool
     restore_value: yes
@@ -84,14 +92,14 @@ power_supply:
 light:
   - platform: esp32_rmt_led_strip
     id: neopixels
-    name: "MagTag NeoPixels"
+    name: "NeoPixels"
     pin: GPIO1
     power_supply: neopixel_power
     num_leds: 4
     chipset: WS2812
     rgb_order: GRB
     initial_state:
-      brightness: 25%
+      brightness: 5%
     effects:
       - addressable_rainbow:
       - addressable_scan:
@@ -99,7 +107,6 @@ light:
       - addressable_random_twinkle:
       - addressable_fireworks:
       - addressable_flicker:
-
     restore_mode: RESTORE_DEFAULT_OFF
     disabled_by_default: true
 
@@ -162,6 +169,8 @@ binary_sensor:
       inverted: true
       allow_other_uses: true
     id: button_d
+    on_click:
+      - light.toggle: neopixels
 
 deep_sleep:
   id: deep_sleep_1
@@ -255,6 +264,18 @@ font:
   - file: "gfonts://Roboto"
     id: roboto_60
     size: 60
+  - file:
+      type: gfonts
+      family: "Doto"
+      weight: 600
+    id: doto_600_42
+    size: 42
+  - file:
+      type: gfonts
+      family: "Doto"
+      weight: 600
+    id: doto_600_56
+    size: 56
 
 spi:
   mosi_pin: GPIO35
@@ -264,14 +285,23 @@ spi:
 display:
   - platform: waveshare_epaper
     id: epaper_display
-#    model: 2.90in
-    model: 2.90in-b
-#    model: gdew029t5
+#    model: 2.90inv2
+    model: 2.90inv2-r2
+#    model: 2.90in-bV3
     cs_pin: GPIO8
     dc_pin: GPIO7
     reset_pin: GPIO6
     busy_pin: GPIO5
-    update_interval: never
+#    update_interval: 20s
 #    full_update_every: 1
+    rotation: 270
     lambda: |-
-      it.printf(0, 0, id(roboto_40), "MagTag Connected!");
+      ESP_LOGI("display", "Updating display");
+      
+      if (!id(initialized)) {
+        it.print(it.get_width() / 2, it.get_height() / 2, id(roboto_40), TextAlign::CENTER, "Starting...");
+        return;
+      }      
+      
+      it.strftime(it.get_width() / 2, it.get_height() / 4, id(doto_600_56), TextAlign::CENTER, "%H:%M:%S", id(ha_time).now());
+      it.strftime(it.get_width() / 2, it.get_height() * 3 / 4, id(doto_600_42), TextAlign::CENTER, "%a %b %d", id(ha_time).now());
