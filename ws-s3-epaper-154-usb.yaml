@@ -20,6 +20,7 @@ deep_sleep:
 
 display:
   - id: !extend epaper_display
+    update_interval: 5min
     rotation: 0
     lambda: |-
       id(epd_power).turn_on();
