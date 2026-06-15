@@ -6,47 +6,60 @@ Here are a bunch of configs for various boards, in various configurations/usages
 
 ### In Use
 
-* ABRobot SuperMini ESP32-C3 OLED
-  * Home Assistant BLE Proxy
-  * Display shows its own local climate info
-  * BME280 over I2C
-  * Two matching configs spread around the house
-    * One other config for testing on a breadboard
-  * (Sold as "Teyleten", but factory firmware says "ABRobot" at boot)
-
 * Waveshare ESP32-C6 GEEK
   * Home Assistant BLE Proxy
   * Display shows climate info from around the house
-    * A few pages, including WiFi/HASS connection info
+    * A few pages, including pool/outdoors, indoors, WiFi/HASS connection info
   * BME280 over I2C
+    * May change to SHT41 & SPA06 over I2C
+
 
 * Waveshare ESP32-S3 ePaper 1.54
   * Home Assistant BLE Proxy
   * ePaper shows pool and outside climate info
     * On the back porch for pool proximity
-  * Using the "USB" config:
-    * Always plugged in, to be a BLE proxy for outdoor sensors 
+  * Using the "USB" always-plugged-in config:
+    * Allows it to be a BLE proxy for outdoor sensors
+  * Reports climate data from internal SHT41 sensor
+    * But not used because it's in the case and not very accurate
+
+
+* ABRobot SuperMini ESP32-C3 OLED
+  * Home Assistant BLE Proxy
+  * Display shows its own local climate info
+  * BME280 over I2C
+    * Some need adjustments to account for high temperature reporting
+      * Handled in the ESPHome config
+      * Got too hot when soldering?
+  * Two matching configs spread around the house
+    * One other config for testing on a breadboard
+  * (Sold as "Teyleten", but factory firmware says "ABRobot" at boot)
+
+### Next
 
 * Waveshare ESP32-S3 Touch LCD 1.54"
   * Clone of ESP32-S3-BOX example Voice Assistant config
   * Display shows VA status and responses
   * Needs some tweaking, the VA response is inconsistent
 
-### Others
 
 * Adafruit Mag-Tag
   * ePaper shows forecast and local climate data
   * Needs tweaking for battery life
   * May attach another climate sensor, can't have too many!
+    * ?SHT41 & SPA06 over I2C?
+
 
 * Waveshare ESP32-C6 Touch LCD 1.47"
   * Display needs some tweaking, sometimes doesn't boot correctly
   * Home Assistant BLE Proxy
   * Display Shows climate info from around the house
-    * A few pages, including pool/outdoors, indoors, WiFi/HASS connection info
   * May attach another climate sensor, can't have too many!
 
+### Others
+
 Adafruit QT Py ESP32-S3
-  * BME280 over I2C
+  * ~~BME280 over I2C~~
+  * SHT41 & SPA06 over I2C
   * Home Assistant BLE Proxy
   * replaced by SuperMini and Geek boards, so the more powerful S3 can be used for something else
