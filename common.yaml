@@ -27,6 +27,11 @@ ota:
   - platform: esphome
     password: ${ota_key}
 
+time:
+  - platform: homeassistant
+    id: ha_time
+    timezone: America/New_York
+
 button:
   - platform: restart
     name: Restart

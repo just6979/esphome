@@ -79,10 +79,6 @@ switch:
       - component.update: epaper_display
       - deep_sleep.allow: deep_sleep_1
 
-time:
-  - platform: homeassistant
-    id: ha_time
-
 power_supply:
   - id: 'neopixel_power'
     pin:

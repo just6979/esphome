@@ -98,15 +98,6 @@ button:
     on_press:
       - component.update: epaper_display
 
-time:
-  - platform: homeassistant
-    id: ha_time
-#    on_time_sync:
-#      - pcf85063.write_time
-#  - platform: pcf85063
-#    id: pcf85063_time
-#    update_interval: never
-
 light:
 #  - platform: status_led
   - platform: monochromatic
