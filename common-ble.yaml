@@ -4,10 +4,9 @@ packages:
 # Wi-Fi connects faster with bluetooth scanning off, so wait for a connection before scanning
 api:
   on_client_connected:
-    - esp32_ble_tracker.start_scan:
-        continuous: true
+    - script.execute: ble_start_scan
   on_client_disconnected:
-    - esp32_ble_tracker.stop_scan:
+    - script.execute: ble_stop_scan
 
 esp32_ble_tracker:
   # for the tweak above
