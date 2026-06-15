@@ -199,7 +199,7 @@ binary_sensor:
     id: button_light
     on_click:
       then:
-        - switch.toggle: stay_awake_switch
+        - component.update: epaper_display
 
   - platform: gpio
     pin:
@@ -209,7 +209,7 @@ binary_sensor:
     id: button_power
     on_click:
       then:
-        - component.update: epaper_display
+        - switch.toggle: stay_awake_switch
 
 deep_sleep:
   id: deep_sleep_1
