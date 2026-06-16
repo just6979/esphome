@@ -15,7 +15,7 @@ esphome:
           brightness: 75%
 
 esp32:
-  variant: esp32c6
+  variant: ESP32C6
   flash_size: 16MB
 
 i2c:
@@ -26,14 +26,6 @@ i2c:
   scan: True
   frequency: 400kHz
 
-# ─────────────────────────────────────────────────────
-# SPI Bus for the LCD
-# Pin mapping (from Waveshare ESP-IDF demo & confirmed
-# with CircuitPython on the actual hardware):
-#   SCLK = GPIO1    MOSI = GPIO2    DC  = GPIO3
-#   RST  = GPIO4    CS   = GPIO5    BL  = GPIO6
-#   BTN  = GPIO9
-# ─────────────────────────────────────────────────────
 spi:
   clk_pin: GPIO1
   mosi_pin: GPIO2
@@ -105,8 +97,8 @@ binary_sensor:
     id: button1
     on_press:
       then:
-        - display.page.show_next: geek_display
-        - component.update: geek_display
+        - display.page.show_next: lcd
+        - component.update: lcd
 
 color:
   - id: color_white
@@ -164,7 +156,7 @@ font:
 display:
   - platform: mipi_spi
     model: st7789v
-    id: geek_display
+    id: lcd
     dimensions:
       width: 135
       height: 240
