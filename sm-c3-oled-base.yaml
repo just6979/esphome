@@ -103,26 +103,25 @@ light:
       ignore_strapping_warning: true
 
 font:
-  - file: "gfonts://Roboto"
-    id: roboto
-    size: 11
+  - file:
+      type: gfonts
+      family: "Ubuntu Mono"
+    id: ubuntu_mono
+    size: 15
 
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 72x40"
     id: oled
-    update_interval: 10s
-    address: 0x3C
     rotation: 180
+    contrast: 75%
     lambda: |-
       if (id(display_on)) {
         float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
-        float hum = id(bme_hum).state;
-        float pres = id(bme_pres).state;
-        it.printf(0, 0, id(roboto),  "T: %.1f° F", temp_fht);
-        it.printf(0, 13, id(roboto), "H: %.1f%% rh", hum);
-        it.printf(0, 26, id(roboto), "P: %.1f mb", pres);
+        it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", temp_fht);
+        it.printf(36, 13, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f %%H", id(bme_hum).state);
+        it.printf(36, 26, id(ubuntu_mono), TextAlign::TOP_CENTER, "%4.f mb", id(bme_pres).state);
       } else {
         it.fill(COLOR_OFF);
       }
-      //ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
+      //ESP_LOGD("sensors", "%.1 °F %.1f %%H %4.f mb", temp_fht, id(bme_hum).state, id(bme_pres).state);
