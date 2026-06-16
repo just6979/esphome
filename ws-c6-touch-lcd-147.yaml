@@ -10,33 +10,31 @@ esphome:
   on_boot:
     priority: -100
     then:
-      - switch.turn_on: screen_switch
+      - light.turn_on:
+          id: lcd_backlight
+          brightness: 75%
 
 esp32:
   variant: ESP32C6
   flash_size: 8MB
 
-color:
-  - id: color_white
-    hex: 'FFFFFF'
-  - id: color_black
-    hex: '000000'
-  - id: color_blue
-    hex: '0000FF'
-  - id: color_green
-    hex: '00FF00'
-  - id: color_gray
-    hex: 'C6C6C6'
-  - id: color_red
-    hex: 'FF0000'
-  - id: color_orange
-    hex: 'F5C77E'
-  - id: color_cyan
-    hex: '00FFFF'
-  - id: color_yellow
-    hex: 'FFFF00'
-  - id: color_purple
-    hex: 'A020F0'
+i2c:
+  sda: GPIO18
+  scl: GPIO19
+  scan: True
+  frequency: 400kHz
+
+spi:
+  clk_pin: GPIO1
+  mosi_pin: GPIO2
+
+external_components:
+  - source: github://widget/esphome-components
+    components: [ axs5106 ]
+    refresh: 0s
+  #  - source: github://dala318/esphome-qmi8658
+  #    components: [qmi8658]
+  #    refresh: 5s
 
 globals:
   - id: last_touch_x
@@ -72,41 +70,19 @@ globals:
     restore_value: no
     initial_value: '0'
 
+output:
+  - platform: ledc
+    id: lcd_backlight_pin
+    pin: GPIO23
 
-# Text Sensors
-text_sensor:
-  - platform: wifi_info
-    ssid:
-      name: "WiFi SSID"
-      id: wifi_ssid
-
-    ip_address:
-      name: "WiFi IP"
-      id: wifi_ip
-
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO9
-      inverted: true
-      mode: INPUT_PULLUP
-      ignore_strapping_warning: true
-    name: "Button"
-    id: button1
-
-i2c:
-  sda: GPIO18
-  scl: GPIO19
-  scan: True
-  frequency: 400kHz
-
-external_components:
-#  - source: github://dala318/esphome-qmi8658
-#    components: [qmi8658]
-#    refresh: 5s
-  - source: github://widget/esphome-components
-    components: [ axs5106 ]
-    refresh: 0s
+light:
+  - platform: monochromatic
+    output: lcd_backlight_pin
+    name: "Display Backlight"
+    disabled_by_default: true
+    id: lcd_backlight
+    icon: mdi:brightness-7
+    restore_mode: RESTORE_AND_ON
 
 sensor:
 #  - platform: qmi8658
@@ -133,19 +109,65 @@ sensor:
 #      name: "QMI8658 Temperature"
 #    update_interval: 5s
 
-# Touchscreen
+  - platform: homeassistant
+    id: backyard_temp
+    entity_id: sensor.backyard_temperature
+
+  - platform: homeassistant
+    id: backyard_hum
+    entity_id: sensor.backyard_humidity
+
+  - platform: homeassistant
+    id: pool_temperature
+    entity_id: sensor.outside_pool_temperature
+
+  - platform: homeassistant
+    id: indoor_temp
+    entity_id: sensor.indoor_temperature
+
+  - platform: homeassistant
+    id: indoor_hum
+    entity_id: sensor.indoor_humidity
+
+  - platform: homeassistant
+    id: pressure
+    entity_id: sensor.barometer
+
+text_sensor:
+  - platform: wifi_info
+    ssid:
+      name: "WiFi SSID"
+      id: wifi_ssid
+
+    ip_address:
+      name: "WiFi IP"
+      id: wifi_ip
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+      mode: INPUT_PULLUP
+      ignore_strapping_warning: true
+    id: button1
+    on_press:
+      then:
+        - display.page.show_next: lcd
+        - component.update: lcd
+
 touchscreen:
   platform: axs5106
   id: my_touchscreen
-  interrupt_pin: 21
-  reset_pin: 20
+  interrupt_pin: GPIO21
+  reset_pin: GPIO20
   calibration:
     x_min: 0
     y_min: 0
     y_max: 320
     x_max: 172
   transform:
-    mirror_x: True
+    mirror_y: True
   on_touch:
     - lambda: |-
         id(is_touching) = true;
@@ -163,6 +185,8 @@ touchscreen:
         }
 
   on_release:
+    - display.page.show_next: lcd
+    - component.update: lcd
     - lambda: |-
         id(is_touching) = false;
         unsigned long duration = millis() - id(touch_start_time);
@@ -228,59 +252,52 @@ touchscreen:
           end_x: !lambda 'return id(last_touch_x);'
           end_y: !lambda 'return id(last_touch_y);'
 
-output:
-  - platform: ledc
-    id: lcd_backlight
-    pin: GPIO23
-    inverted: false
-    frequency: 1000 Hz
+color:
+  - id: color_white
+    hex: 'FFFFFF'
+  - id: color_light_grey
+    hex: 'DDDDDD'
+  - id: color_grey
+    hex: '808080'
+  - id: color_dark_grey
+    hex: '404040'
+  - id: color_black
+    hex: '000000'
+  - id: color_red
+    hex: 'FF0000'
+  - id: color_orange
+    hex: 'F5C77E'
+  - id: color_yellow
+    hex: 'FFFF00'
+  - id: color_green
+    hex: '00FF00'
+  - id: color_cyan
+    hex: '00FFFF'
+  - id: color_blue
+    hex: '0000FF'
+  - id: color_purple
+    hex: 'A020F0'
 
-switch:
-  - platform: template
-    name: "Display ON⁄OFF"
-    id: screen_switch
-    turn_on_action:
-      - output.turn_on: lcd_backlight
-    turn_off_action:
-      - output.turn_off: lcd_backlight
-    optimistic: true
-
-number:
-  - platform: template
-    name: "Screen Brightness"
-    id: display_brightness
-    optimistic: true
-    min_value: 0
-    max_value: 100
-    step: 5
-    initial_value: 20
-    restore_value: true
-    mode: slider
-    on_value:
-      then:
-        - output.set_level:
-            id: lcd_backlight
-            level: !lambda "return x / 100.0;"
-
-spi:
-  clk_pin: GPIO1
-  mosi_pin: GPIO2
-
-# Fonts
 font:
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
+    id: font_xlarge
+    size: 64
   - file: "gfonts://Roboto"
-    id: roboto12
-    size: 12
+    id: font_medium
+    size: 26
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 16
 
-  - file: "gfonts://Roboto"
-    id: roboto20
-    size: 20
 
 # LCD Display (172x320 ST7789V)
 display:
   - platform: mipi_spi
+    model: st7789v
     id: lcd
-    model: ST7789V
     dc_pin:
       number: GPIO15
       ignore_strapping_warning: true
@@ -299,64 +316,95 @@ display:
     data_rate: 40MHz
     color_order: bgr
     update_interval: 1s
-    lambda: |-
-      // Header
-      it.filled_rectangle(0, 0, 172, 40, id(color_green));
-      it.print(it.get_width() / 2, 10, id(roboto20), id(color_black), TextAlign::TOP_CENTER, "${device_name}");
-      it.line(0, 40, 172, 40, id(color_gray));
+    pages:
+      - id: page_pool
+        lambda: |-
+          const int middle = 86;
+          const int line1 = 5;
+          const int line2 = 60;
+          const int line5 = 135;
+          const int line6 = 170;
+          const int line7 = 205;
+          const int right1 = 160;
+          const int bottom1 = 310;
 
-      // WiFi
-      it.print(10, 50, id(roboto20), id(color_white), "WiFi");
-      if (id(wifi_ssid).has_state()) {
-        it.printf(10, 70, id(roboto12), id(color_yellow), "SSID: %s", id(wifi_ssid).state.c_str());
-      }
-      if (id(wifi_ip).has_state()) {
-        it.printf(10, 85, id(roboto12), id(color_yellow), "IP: %s", id(wifi_ip).state.c_str());
-      }
+          it.fill(id(color_black));
 
-      it.line(0, 120, 172, 120, id(color_gray));
+          if (id(api_id).is_connected()) {
+            it.print(middle, line1, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "Pool");
+            it.printf(middle, line2, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "%.1f°", id(pool_temperature).state);
 
-      // System
-      it.print(10, 130, id(roboto20), id(color_white), "System");
-      if (id(uptime_s).has_state()) {
-        it.printf(10, 150, id(roboto12), id(color_orange), "Uptime: %.0f", id(uptime_s).state);
-      }
+            it.printf(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
+            it.printf(middle, line6, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f°F", id(backyard_temp).state);
+            it.printf(middle, line7, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f%%", id(backyard_hum).state);
+          } else {
+            it.print(middle, line5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
 
-      it.line(0, 185, 172, 185, id(color_gray));
+          it.printf(right1, bottom1, id(font_small), id(color_grey), TextAlign::BOTTOM_RIGHT, "Pg 1 / 3");
 
-      // Touch
-      it.print(10, 195, id(roboto20), id(color_white), "Touch");
-      
-      // Touch type with conditional color
-      Color touch_color = id(color_white);
-      if (id(last_touch_type) == "Short press") {
-        touch_color = id(color_cyan);
-      } else if (id(last_touch_type) == "Long press") {
-        touch_color = id(color_purple);
-      } else if (id(last_touch_type) == "Slide") {
-        touch_color = id(color_orange);
-      }
-      it.printf(10, 215, id(roboto12), touch_color, "Type: %s", id(last_touch_type).c_str());
-      
-      // Slide direction
-      if (id(last_slide_direction) != "None") {
-        Color direction_color = id(color_white);
-        if (id(last_slide_direction) == "Left") {
-          direction_color = id(color_blue);
-        } else if (id(last_slide_direction) == "Right") {
-          direction_color = id(color_green);
-        } else if (id(last_slide_direction) == "Up") {
-          direction_color = id(color_yellow);
-        } else if (id(last_slide_direction) == "Down") {
-          direction_color = id(color_red);
-        }
-        it.printf(10, 230, id(roboto12), direction_color, "Dir: %s", id(last_slide_direction).c_str());
-        it.printf(10, 245, id(roboto12), id(color_gray), "Start: %d,%d", id(touch_start_x), id(touch_start_y));
-        it.printf(10, 260, id(roboto12), id(color_gray), "End: %d,%d", id(last_touch_x), id(last_touch_y));
-      } else {
-        // Show coordinates for simple press
-        it.printf(10, 230, id(roboto12), touch_color, "X: %d  Y: %d", id(last_touch_x), id(last_touch_y));
-      }
+      - id: page_climate
+        lambda: |-
+          const int middle = 86;
+          const int line1 = 5;
+          const int line2 = 35;
+          const int line3 = 65;
+          const int line4 = 95;
+          const int line5 = 135;
+          const int line6 = 170;
+          const int line7 = 205;
+          const int right1 = 160;
+          const int bottom1 = 310;
+          
+          float temp = id(indoor_temp).state;
+          float hum = id(indoor_hum).state;
+          float pres = id(pressure).state;
+          ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp, hum, pres);
 
-      // Footer - Current time
-      it.strftime(86, 300, id(roboto12), id(color_white), TextAlign::BOTTOM_CENTER, "%H:%M:%S", id(ha_time).now());
+          it.fill(id(color_black));
+
+          it.printf(middle, line1, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Indoors");
+          it.printf(middle, line2, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f° F", temp);
+          it.printf(middle, line3, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f%% RH", hum);
+          it.printf(middle, line4, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f mb", pres);
+
+          if (id(api_id).is_connected()) {
+            it.printf(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
+            it.printf(middle, line6, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f° F", id(backyard_temp).state);
+            it.printf(middle, line7, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f%% RH", id(backyard_hum).state);
+          } else {
+            it.print(middle, line5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
+
+          it.printf(right1, bottom1, id(font_small), id(color_grey), TextAlign::BOTTOM_RIGHT, "Pg 2 / 3");
+
+      - id: page_status
+        lambda: |-
+          const int middle = 86;
+          const int line1 = 5;
+          const int line2 = 35;
+          const int line3 = 65;
+          const int line4 = 95;
+          const int line5 = 135;
+          const int line6 = 170;
+          const int line7 = 205;
+          const int right1 = 160;
+          const int bottom1 = 310;
+
+          it.fill(id(color_black));
+
+          it.print(middle, line1, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Network");
+
+          if (id(api_id).is_connected()) {
+            it.printf(middle, line2, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%s", id(wifi_ssid).state.c_str());
+            it.printf(middle, line3, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%s", id(wifi_ip).state.c_str());
+            it.printf(middle, line4, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0f dBm", id(wifi_rssi).state);
+          } else {
+            it.print(middle, line2, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
+
+          it.print(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "System");
+          it.printf(middle, line6, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%d KB Free", esp_get_free_heap_size() / 1024);
+          it.printf(middle, line7, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.0fs Uptime", id(uptime_s).state);
+
+          it.printf(right1, bottom1, id(font_small), id(color_grey), TextAlign::BOTTOM_RIGHT, "Pg 2 / 3");
