@@ -11,12 +11,6 @@ esp32:
   flash_size: 4MB
 #  toolchain: esp-idf
 
-globals:
-  - id: display_on
-    type: bool
-    restore_value: yes
-    initial_value: "true"
-
 i2c:
   sda: GPIO5
   scl: GPIO6
@@ -52,51 +46,41 @@ binary_sensor:
     on_click:
       then:
         - lambda: |-
-            id(display_on) = !id(display_on);
-            ESP_LOGD("button", "Display: %s", id(display_on) ? "ON" : "OFF");
+            id(oled).is_on() ? id(oled).turn_off(): id(oled).turn_on();
         - component.update: oled
     on_double_click:
       then:
         - light.toggle: light_status
-        - lambda: |-
-            ESP_LOGD("button", "Blue LED: %s", id(light_status).current_values.is_on() ? "ON" : "OFF");
 
 switch:
   - platform: template
-    name: "Display"
+    name: "Display ON⁄OFF"
     restore_mode: RESTORE_DEFAULT_ON
-    lambda: |-
-      return id(display_on);
+    lambda: return id(oled).is_on();
     turn_on_action:
-      - lambda: |-
-          id(display_on) = true;
-          ESP_LOGD("switch", "Display: ON");
-      - component.update: oled
+      - lambda: id(oled).turn_on();
     turn_off_action:
-      - lambda: |-
-          id(display_on) = false;
-          ESP_LOGD("switch", "Display: OFF");
-      - component.update: oled
+      - lambda: id(oled).turn_off();
 
+number:
   - platform: template
-    name: "Blue LED"
-    restore_mode: RESTORE_DEFAULT_ON
-    lambda: |-
-      return id(light_status).current_values.is_on();
-    turn_on_action:
-      - lambda: |-
-          ESP_LOGD("switch", "Blue LED: ON");
-      - light.turn_on: light_status
-    turn_off_action:
-      - lambda: |-
-          ESP_LOGD("switch", "Blue LED: OFF");
-      - light.turn_off: light_status
+    name: "Contrast"
+    min_value: 1
+    max_value: 10
+    step: 1
+    # above 50% doesn't seem to do much, so treat that as the max
+    lambda: return id(oled).get_contrast() * 5.0;
+    set_action:
+      then:
+        lambda: id(oled).set_contrast(x / 5.0);
+
 
 light:
   - platform: status_led
     id: light_status
     name: "Status LED"
     disabled_by_default: true
+    restore_mode: RESTORE_DEFAULT_OFF
     pin:
       number: GPIO08
       inverted: true
@@ -114,14 +98,11 @@ display:
     model: "SSD1306 72x40"
     id: oled
     rotation: 180
-    contrast: 75%
+    # above 50% doesn't seem to do much, so treating that as max
+    contrast: 50%
     lambda: |-
-      if (id(display_on)) {
-        float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
-        it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", temp_fht);
-        it.printf(36, 13, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f %%H", id(bme_hum).state);
-        it.printf(36, 26, id(ubuntu_mono), TextAlign::TOP_CENTER, "%4.f mb", id(bme_pres).state);
-      } else {
-        it.fill(COLOR_OFF);
-      }
+      float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
+      it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", temp_fht);
+      it.printf(36, 13, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f %%H", id(bme_hum).state);
+      it.printf(36, 26, id(ubuntu_mono), TextAlign::TOP_CENTER, "%4.f mb", id(bme_pres).state);
       //ESP_LOGD("sensors", "%.1 °F %.1f %%H %4.f mb", temp_fht, id(bme_hum).state, id(bme_pres).state);
