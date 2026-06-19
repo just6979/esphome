@@ -81,7 +81,6 @@ esphome:
 esp32:
   variant: ESP32S3
   flash_size: 8MB
-  toolchain: esp-idf
 
 psram:
   mode: octal

@@ -10,6 +10,7 @@ esphome:
 esp32:
   framework:
     type: esp-idf
+  toolchain: esp-idf
 
 logger:
   level: DEBUG
