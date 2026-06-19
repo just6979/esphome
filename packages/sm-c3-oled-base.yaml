@@ -9,7 +9,7 @@ substitutions:
 esp32:
   variant: ESP32C3
   flash_size: 4MB
-#  toolchain: esp-idf
+  toolchain: esp-idf
 
 i2c:
   sda: GPIO5
