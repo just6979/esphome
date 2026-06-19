@@ -17,6 +17,7 @@ esphome:
 esp32:
   variant: ESP32C6
   flash_size: 8MB
+  toolchain: esp-idf
 
 i2c:
   sda: GPIO18
