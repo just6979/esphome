@@ -25,6 +25,7 @@ esphome:
 esp32:
   variant: ESP32S2
   flash_size: 4MB
+  toolchain: esp-idf
 
 psram:
   speed: 80MHz
