@@ -7,5 +7,11 @@ substitutions:
   api_key: !secret sm-c3-oled-a-key
   bme_temp_filters:
     - offset: 0.0
+  #    - calibrate_polynomial:
+  #        degree: 1
+  #        datapoints:
   bme_hum_filters:
     - offset: 0.0
+#    - calibrate_polynomial:
+#        degree: 1
+#        datapoints:
