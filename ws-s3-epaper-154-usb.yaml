@@ -1,6 +1,6 @@
 packages:
-  common-options: !include common-ble.yaml
-  ws-s3-epaper: !include ws-s3-epaper-154-base.yaml
+  common-options: !include packages/common-ble.yaml
+  ws-s3-epaper: !include packages/ws-s3-epaper-154-base.yaml
 
 substitutions:
   device_name: ws-s3-epaper-154-usb

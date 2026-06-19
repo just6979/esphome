@@ -1,5 +1,5 @@
 packages:
-  common-options: !include common.yaml
+  common-options: !include packages/common.yaml
 
 substitutions:
   device_name: mag-tag

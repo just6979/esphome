@@ -1,5 +1,5 @@
 packages:
-  common-options: !include common.yaml
+  common-options: !include packages/common.yaml
 
 substitutions:
   device_name: ws-s3-touch-lcd-154
@@ -178,6 +178,7 @@ media_player:
   - platform: speaker
     name: "Media Player"
     id: the_media_player
+    task_stack_in_psram: true
     volume_min: 25%
     volume_max: 100%
     announcement_pipeline:
@@ -229,6 +230,7 @@ micro_wake_word:
   on_wake_word_detected:
     - voice_assistant.start:
         wake_word: !lambda return wake_word;
+  task_stack_in_psram: true
 
 voice_assistant:
   id: va

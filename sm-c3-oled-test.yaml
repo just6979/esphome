@@ -1,5 +1,5 @@
 packages:
-  sm-cd-oled-base: !include sm-c3-oled-base.yaml
+  sm-cd-oled-base: !include packages/sm-c3-oled-base.yaml
 
 substitutions:
   device_name: sm-c3-oled-test
