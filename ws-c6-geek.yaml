@@ -1,5 +1,5 @@
 packages:
-  common-options: !include packages/common-ble.yaml
+  common-options: !include packages/common-ble-singlecore.yaml
 
 substitutions:
   device_name: ws-c6-geek

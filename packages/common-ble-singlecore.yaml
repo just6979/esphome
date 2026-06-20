@@ -1,0 +1,31 @@
+packages:
+  common-options: !include common-ble.yaml
+
+# on some single-core SoCs, Wi-Fi connects faster with bluetooth scanning off,
+# so wait for an API connection before scanning
+api:
+  on_client_connected:
+    - script.execute: ble_start_scan
+  on_client_disconnected:
+    - if:
+        condition:
+          not:
+            api.connected:
+        then:
+          - script.execute: ble_stop_scan
+
+esp32_ble_tracker:
+  # for the tweak above
+  scan_parameters:
+    continuous: false
+
+script:
+  - id: !extend ble_start_scan
+    then:
+      - logger.log: "ENabling BLE Scans"
+      - esp32_ble_tracker.start_scan:
+          continuous: true
+  - id: !extend ble_stop_scan
+    then:
+      - logger.log: "DISabling BLE Scans"
+      - esp32_ble_tracker.stop_scan:

@@ -1,5 +1,5 @@
 packages:
-  common-options: !include packages/common-ble.yaml
+  common-options: !include packages/common-ble-singlecore
 
 substitutions:
   device_name: ws-c6-touch-lcd-147

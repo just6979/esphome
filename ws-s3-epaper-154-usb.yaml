@@ -1,6 +1,6 @@
 packages:
-  common-options: !include packages/common.yaml
-#  common-options: !include packages/common-ble.yaml
+#  common-options: !include packages/common.yaml
+  common-options: !include packages/common-ble.yaml
   ws-s3-epaper: !include packages/ws-s3-epaper-154-base.yaml
 
 substitutions:
@@ -12,8 +12,8 @@ globals:
   - id: !extend stay_awake
     initial_value: "true"
 
-#esp32_ble:
-#  use_psram: true
+esp32_ble:
+  use_psram: true
 
 deep_sleep:
   id: deep_sleep_1
