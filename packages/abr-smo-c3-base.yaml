@@ -75,10 +75,14 @@ number:
     max_value: 10
     step: 1
     # above 50% doesn't seem to do much, so treat that as the max
-    lambda: return id(oled).get_contrast() * 5.0;
+    lambda: |-
+      float adjusted_contrast = id(oled).get_contrast() * 20;
+      //ESP_LOGD("misc", "     raw contrast: %f", id(oled).get_contrast());
+      //ESP_LOGD("misc", "adjusted contrast: %f", adjusted_contrast);
+      return adjusted_contrast;
     set_action:
       then:
-        lambda: id(oled).set_contrast(x / 5.0);
+        lambda: id(oled).set_contrast(x / 20);
 
 light:
   - platform: status_led
