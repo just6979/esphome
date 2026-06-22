@@ -95,7 +95,7 @@ wifi:
 button:
   - platform: template
     name: "Refresh Display"
-    icon: mdi:refresh
+    icon: mdi:eye-refresh-outline
     on_press:
       - component.update: epaper_display
 
@@ -157,6 +157,7 @@ switch:
     id: stay_awake_switch
     name: "Stay Awake"
     entity_category: config
+    icon: mdi:coffee
     restore_mode: RESTORE_DEFAULT_OFF
     lambda: |-
       if (id(stay_awake)) {
