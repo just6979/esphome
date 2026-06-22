@@ -151,6 +151,7 @@ binary_sensor:
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
     id: button1
+    name: "Button"
     on_press:
       then:
         - display.page.show_next: lcd

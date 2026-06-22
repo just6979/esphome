@@ -30,7 +30,6 @@ spi:
   clk_pin: GPIO1
   mosi_pin: GPIO2
 
-# Backlight via LEDC PWM (allows brightness control)
 output:
   - platform: ledc
     pin: GPIO6
@@ -80,13 +79,6 @@ text_sensor:
       name: "Connected SSID"
       id: wifi_ssid
 
-#  - platform: homeassistant
-#    id: ha_datetime
-#    name: "HA Datetime"
-#    entity_id: sensor.date_time
-
-# The Onboard Button (GPIO 9, active-low).
-# Pressing it cycles through the available pages.
 binary_sensor:
   - platform: gpio
     pin:
@@ -95,6 +87,7 @@ binary_sensor:
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
     id: button1
+    name: "Button"
     on_press:
       then:
         - display.page.show_next: lcd
