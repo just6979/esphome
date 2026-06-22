@@ -95,6 +95,7 @@ wifi:
 button:
   - platform: template
     name: "Refresh Display"
+    icon: mdi:refresh
     on_press:
       - component.update: epaper_display
 
@@ -189,8 +190,6 @@ binary_sensor:
       ignore_strapping_warning: true
       allow_other_uses: true
     id: button_light
-    name: "Refresh Button"
-    icon: mdi:refresh
     on_click:
       then:
         - component.update: epaper_display
