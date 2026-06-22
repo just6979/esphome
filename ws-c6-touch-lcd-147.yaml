@@ -79,7 +79,7 @@ light:
   - platform: monochromatic
     output: lcd_backlight_pin
     name: "Display Backlight"
-    disabled_by_default: true
+    entity_category: config
     id: lcd_backlight
     icon: mdi:brightness-7
     restore_mode: RESTORE_AND_ON

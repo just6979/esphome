@@ -104,20 +104,20 @@ light:
       - addressable_fireworks:
       - addressable_flicker:
     restore_mode: RESTORE_DEFAULT_OFF
-    disabled_by_default: true
+    entity_category: config
 
 #  - platform: status_led
 #    id: red_led
 #    name: "Red LED"
 #    pin: GPIO13
-#    disabled_by_default: true
+#    entity_category: config
 
   - platform: monochromatic
     id: red_led
     name: "Red LED"
     output: gpio_13
     restore_mode: RESTORE_DEFAULT_OFF
-    disabled_by_default: true
+    entity_category: config
 
 output:
   - platform: ledc

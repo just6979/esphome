@@ -58,6 +58,7 @@ binary_sensor:
 switch:
   - platform: template
     name: "Display ON⁄OFF"
+    entity_category: config
     restore_mode: RESTORE_DEFAULT_ON
     lambda: return id(oled).is_on();
     turn_on_action:
@@ -68,6 +69,8 @@ switch:
 number:
   - platform: template
     name: "Contrast"
+    entity_category: config
+    icon: mdi:brightness-7
     min_value: 1
     max_value: 10
     step: 1
@@ -81,7 +84,7 @@ light:
   - platform: status_led
     id: light_status
     name: "Status LED"
-    disabled_by_default: true
+    entity_category: config
     restore_mode: RESTORE_DEFAULT_OFF
     pin:
       number: GPIO08

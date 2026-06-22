@@ -103,8 +103,8 @@ light:
   - platform: monochromatic
     id: green_led
     name: "Green LED"
+    entity_category: config
     restore_mode: RESTORE_DEFAULT_ON
-    disabled_by_default: true
     output: gpio_3
 
 output:
@@ -155,6 +155,7 @@ switch:
   - platform: template
     id: stay_awake_switch
     name: "Stay Awake"
+    entity_category: config
     restore_mode: RESTORE_DEFAULT_OFF
     lambda: |-
       if (id(stay_awake)) {
@@ -188,6 +189,8 @@ binary_sensor:
       ignore_strapping_warning: true
       allow_other_uses: true
     id: button_light
+    name: "Refresh Button"
+    icon: mdi:refresh
     on_click:
       then:
         - component.update: epaper_display
