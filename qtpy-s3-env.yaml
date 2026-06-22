@@ -76,6 +76,10 @@ i2c:
     frequency: 400kHz
 
 sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    entity_category: diagnostic
+
   - platform: sht4x
     i2c_id: i2c_qt
     heater_max_duty: 0.01

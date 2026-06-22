@@ -85,6 +85,10 @@ light:
     restore_mode: RESTORE_AND_ON
 
 sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    entity_category: diagnostic
+
 #  - platform: qmi8658
 #    address: 0x6B
 ##    interrupt_pin_1: GPIO5

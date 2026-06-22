@@ -17,6 +17,10 @@ i2c:
   frequency: 400kHz
 
 sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    entity_category: diagnostic
+
   - platform: bme280_i2c
     address: 0x76
     update_interval: 60s
@@ -72,7 +76,6 @@ number:
     set_action:
       then:
         lambda: id(oled).set_contrast(x / 5.0);
-
 
 light:
   - platform: status_led

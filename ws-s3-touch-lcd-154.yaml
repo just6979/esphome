@@ -133,6 +133,10 @@ i2c:
     sda: GPIO42
 
 sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    entity_category: diagnostic
+
   - platform: adc
     name: "Battery Voltage"
     pin: GPIO1

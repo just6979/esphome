@@ -45,6 +45,10 @@ light:
     restore_mode: RESTORE_AND_ON
 
 sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    entity_category: diagnostic
+
   - platform: bme280_i2c
     address: 0x76
     update_interval: 60s

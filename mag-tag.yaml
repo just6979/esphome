@@ -205,6 +205,10 @@ i2c:
   frequency: 400kHz
 
 sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
+    entity_category: diagnostic
+
   - platform: adc
     id: battery_voltage
     name: "Battery Voltage"
