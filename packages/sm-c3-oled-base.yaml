@@ -2,8 +2,8 @@ packages:
   common-options: !include common-ble-singlecore.yaml
 
 substitutions:
-  device_name: ws-touch-lcd-147-c6
-  friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
+  device_name: sm-c3-oled-base
+  friendly_name: "SuperMini ESP32-C3 OLED Base"
   api_key: ${api_key}
 
 esp32:
