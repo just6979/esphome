@@ -37,6 +37,7 @@ time:
 button:
   - platform: restart
     name: Restart
+    entity_category: diagnostic
 
 sensor:
   - platform: wifi_signal
