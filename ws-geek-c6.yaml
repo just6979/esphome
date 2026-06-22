@@ -58,18 +58,55 @@ sensor:
     name: "Internal Temperature"
     entity_category: diagnostic
 
-  - platform: bme280_i2c
-    address: 0x76
-    update_interval: 60s
+#  - platform: bme280_i2c
+#    address: 0x76
+#    update_interval: 60s
+#    temperature:
+#      name: "Temperature"
+#      id: temperature
+#    humidity:
+#      name: "Humidity"
+#      id: humidity
+#    pressure:
+#      name: "Pressure"
+#      id: pressure
+
+  - platform: sht4x
+    heater_max_duty: 0.01
     temperature:
-     name: "Temperature"
-     id: bme_temp
+      name: "Temperature (SHT4X)"
+      id: temperature_sht4x
+      disabled_by_default: true
     humidity:
-     name: "Humidity"
-     id: bme_hum
+      name: "Humidity"
+      id: humidity
+
+  - platform: spa06_i2c
+    temperature:
+      name: "Temperature (SPA06)"
+      id: temperature_spa06
+      disabled_by_default: true
     pressure:
-     name: "Pressure"
-     id: bme_pres
+      name: "Pressure"
+      id: pressure
+
+  - platform: combination
+    name: "Temperature"
+    id: temperature
+    type: median
+    sources:
+      - source: temperature_sht4x
+      - source: temperature_spa06
+
+  - platform: combination
+    id: temperature_f
+    type: linear
+    sources:
+      - source: temperature
+        coefficient: 1.0
+    filters:
+      - lambda: return x * (9.0/5.0) + 32.0;
+    unit_of_measurement: "°F"
 
   - platform: homeassistant
     id: backyard_temp
@@ -218,22 +255,17 @@ display:
           const int right1 = 120;
           const int bottom1 = 230;
           
-          float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
-          float hum = id(bme_hum).state;
-          float pres = id(bme_pres).state;
-          ESP_LOGD("sensors", "T: %.1f  H: %.1f%% rh  P: %.1f mb", temp_fht, hum, pres);
-
           it.fill(id(color_black));
 
           it.printf(middle, line1, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Indoors");
-          it.printf(middle, line2, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f°F", temp_fht);
-          it.printf(middle, line3, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%%", hum);
-          it.printf(middle, line4, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", pres);
+          it.printf(middle, line2, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f °F", id(temperature_f).state);
+          it.printf(middle, line3, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f %%H", id(humidity).state);
+          it.printf(middle, line4, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", id(pressure).state / 100.0);
 
           if (id(api_id).is_connected()) {
             it.printf(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
-            it.printf(middle, line6, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f°F", id(backyard_temp).state);
-            it.printf(middle, line7, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%%", id(backyard_hum).state);
+            it.printf(middle, line6, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f°F", id(backyard_temperature).state);
+            it.printf(middle, line7, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%%", id(backyard_humidity).state);
           } else {
             it.print(middle, line5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
           }
