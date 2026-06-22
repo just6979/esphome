@@ -1,10 +1,10 @@
 packages:
-  common-options: !include packages/common-ble-singlecore
+  common-options: !include packages/common-ble-sc.yaml
 
 substitutions:
-  device_name: ws-c6-touch-lcd-147
-  friendly_name: "Waveshare ESP32-C6 Touch LCD 1.47"
-  api_key: !secret ws-c6-touch-lcd-147-key
+  device_name: ws-touch-lcd-147-c6
+  friendly_name: "Waveshare Touch LCD 1.47 ESP32-C6"
+  api_key: !secret ws-touch-lcd-147-c6-key
 
 esphome:
   on_boot:

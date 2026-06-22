@@ -1,9 +1,9 @@
 packages:
-  common-options: !include common-ble-singlecore.yaml
+  common-options: !include common-ble-sc.yaml
 
 substitutions:
-  device_name: sm-c3-oled-base
-  friendly_name: "SuperMini ESP32-C3 OLED Base"
+  device_name: abr-smo-c3-base
+  friendly_name: "ABRobot SuperMini OLED ESP32-C3 Base"
   api_key: ${api_key}
 
 esp32:

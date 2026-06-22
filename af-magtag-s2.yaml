@@ -2,9 +2,9 @@ packages:
   common-options: !include packages/common.yaml
 
 substitutions:
-  device_name: mag-tag
-  friendly_name: "Adafruit Mag-Tag"
-  api_key: !secret mag-tag-key
+  device_name: af-magtag-s2
+  friendly_name: "Adafruit Mag-Tag ESP32-S2"
+  api_key: !secret af-magtag-s2-key
 
 esphome:
   on_boot:

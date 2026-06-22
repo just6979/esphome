@@ -2,9 +2,9 @@ packages:
   common-options: !include packages/common-ble.yaml
 
 substitutions:
-  device_name: qtpy-s3-env
-  friendly_name: "QT-Py ESP32-S3 + Env Sensors"
-  api_key: !secret qtpy-s3-env-key
+  device_name: af-qtpy-s3
+  friendly_name: "Adafruit QT-Py ESP32-S3"
+  api_key: !secret af-qtpy-s3-key
 
 esphome:
   on_boot:

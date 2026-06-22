@@ -1,11 +1,11 @@
 packages:
   common-options: !include packages/common.yaml
-  ws-s3-epaper: !include packages/ws-s3-epaper-154-base.yaml
+  ws-s3-epaper: !include packages/ws-epaper-154-s3-base.yaml
 
 substitutions:
-  device_name: ws-s3-epaper-154-batt
-  friendly_name: "Waveshare ESP32-S3 ePaper 1.54 Battery"
-  api_key: !secret ws-s3-epaper-154-key
+  device_name: ws-epaper-154-s3-batt
+  friendly_name: "Waveshare ePaper 1.54 ESP32-S3 Battery"
+  api_key: !secret ws-epaper-154-s3-key
 
 globals:
   - id: !extend stay_awake

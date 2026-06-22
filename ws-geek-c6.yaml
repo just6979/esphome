@@ -1,10 +1,10 @@
 packages:
-  common-options: !include packages/common-ble-singlecore.yaml
+  common-options: !include packages/common-ble-sc.yaml
 
 substitutions:
-  device_name: ws-c6-geek
-  friendly_name: "Waveshare ESP32-C6 Geek"
-  api_key: !secret ws-c6-geek-key
+  device_name: ws-geek-c6
+  friendly_name: "Waveshare Geek ESP32-C6"
+  api_key: !secret ws-geek-c6-key
 
 esphome:
   on_boot:

@@ -1,0 +1,11 @@
+packages:
+  sm-cd-oled-base: !include packages/abr-smo-c3-base.yaml
+
+substitutions:
+  device_name: abr-smo-c3-t
+  friendly_name: "ABRobot SuperMini OLED ESP32-C3 T"
+  api_key: !secret abr-smo-c3-t-key
+  bme_temp_filters:
+    - offset: 0.0
+  bme_hum_filters:
+    - offset: 0.0

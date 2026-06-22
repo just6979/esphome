@@ -3,11 +3,11 @@
 #packages:
 #  common-options: !include packages/common.yaml
 #  common-options: !include packages/common-ble.yaml
-#  ws-s3-epaper: !include packages/ws-s3-epaper-154-base.yaml
+#  ws-s3-epaper: !include packages/ws-epaper-154-s3-base.yaml
 #substitutions:
-#  device_name: ws-s3-epaper-154
-#  friendly_name: "Waveshare ESP32-S3 ePaper 1.54 Base"
-#  api_key: !secret ws-s3-epaper-154-key
+#  device_name: ws-epaper-154-s3
+#  friendly_name: "Waveshare ePaper 1.54  ESP32-S3Base"
+#  api_key: !secret ws-epaper-154-s3-key
 
 esphome:
   on_boot:
