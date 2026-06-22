@@ -110,11 +110,11 @@ sensor:
     unit_of_measurement: "°F"
 
   - platform: homeassistant
-    id: backyard_temp
+    id: backyard_temperature
     entity_id: sensor.backyard_temperature
 
   - platform: homeassistant
-    id: backyard_hum
+    id: backyard_humidity
     entity_id: sensor.backyard_humidity
 
   - platform: homeassistant
@@ -235,10 +235,10 @@ display:
             it.printf(middle, line3, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "%.1f°", id(pool_temperature).state);
 
             it.printf(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
-            it.printf(middle, line6, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f°F", id(backyard_temp).state);
-            it.printf(middle, line7, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%%", id(backyard_hum).state);
+            it.printf(middle, line6, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f°F", id(backyard_temperature).state);
+            it.printf(middle, line7, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f%%", id(backyard_humidity).state);
           } else {
-            it.print(middle, line3, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+            it.print(middle, line5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
           }
 
           it.printf(right1, bottom1, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 1 / 3");
