@@ -28,6 +28,15 @@ spi:
   clk_pin: GPIO1
   mosi_pin: GPIO2
 
+button:
+  - platform: template
+    name: "Next Page"
+    icon: mdi:page-next
+    on_press:
+      then:
+        - display.page.show_next: lcd
+        - component.update: lcd
+
 external_components:
   - source: github://widget/esphome-components
     components: [ axs5106 ]
@@ -155,7 +164,6 @@ binary_sensor:
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
     id: button1
-    name: "Button"
     on_press:
       then:
         - display.page.show_next: lcd
