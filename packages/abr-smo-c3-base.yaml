@@ -55,39 +55,39 @@ binary_sensor:
       then:
         - light.toggle: light_status
 
-switch:
+output:
   - platform: template
-    name: "Display ON⁄OFF"
-    entity_category: config
-    restore_mode: RESTORE_DEFAULT_ON
-    lambda: return id(oled).is_on();
-    turn_on_action:
-      - lambda: id(oled).turn_on();
-    turn_off_action:
-      - lambda: id(oled).turn_off();
-
-number:
-  - platform: template
-    name: "Contrast"
-    entity_category: config
-    icon: mdi:brightness-7
-    min_value: 1
-    max_value: 10
-    step: 1
-    # above 50% doesn't seem to do much, so treat that as the max
-    lambda: |-
-      float adjusted_contrast = id(oled).get_contrast() * 20;
-      //ESP_LOGD("misc", "     raw contrast: %f", id(oled).get_contrast());
-      //ESP_LOGD("misc", "adjusted contrast: %f", adjusted_contrast);
-      return adjusted_contrast;
-    set_action:
-      then:
-        lambda: id(oled).set_contrast(x / 20);
+    id: display_output
+    type: float
+    min_power: 0.01
+    # the oled doesn't get noticeably brighter above 66%
+    max_power: 0.66
+    write_action:
+      lambda: |-
+        id(oled).set_contrast(state);
 
 light:
+  - platform: monochromatic
+    id: display_light
+    name: "Display"
+    output: display_output
+    icon: mdi:television
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_OFF
+    initial_state:
+      color_mode: BRIGHTNESS
+      brightness: 50%
+    on_turn_on:
+      lambda: |-
+        id(oled).turn_on();
+    on_turn_off:
+      lambda: |-
+        id(oled).turn_off();
+
   - platform: status_led
     id: light_status
     name: "Status LED"
+    icon: mdi:led-outline
     entity_category: config
     restore_mode: RESTORE_DEFAULT_OFF
     pin:
@@ -107,11 +107,7 @@ display:
     model: "SSD1306 72x40"
     id: oled
     rotation: 180
-    # above 50% doesn't seem to do much, so treating that as max
-    contrast: 50%
     lambda: |-
-      float temp_fht = (id(bme_temp).state * 9 / 5) + 32;
-      it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", temp_fht);
+      it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", (id(bme_temp).state * 9.0 / 5.0) + 32);
       it.printf(36, 13, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f %%H", id(bme_hum).state);
       it.printf(36, 26, id(ubuntu_mono), TextAlign::TOP_CENTER, "%4.f mb", id(bme_pres).state);
-      //ESP_LOGD("sensors", "%.1 °F %.1f %%H %4.f mb", temp_fht, id(bme_hum).state, id(bme_pres).state);
