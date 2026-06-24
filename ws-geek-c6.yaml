@@ -90,6 +90,22 @@ sensor:
       - lambda: return x * (9.0 / 5.0) + 32.0;
     unit_of_measurement: "°F"
 
+  - platform: bme280_i2c
+    address: 0x76
+    update_interval: 60s
+    temperature:
+      name: "Temperature (BME)"
+      id: bme_temp
+      disabled_by_default: true
+    humidity:
+      name: "Humidity (BME)"
+      id: bme_hum
+      disabled_by_default: true
+    pressure:
+      name: "Pressure (BME)"
+      id: bme_pres
+      disabled_by_default: true
+
   - platform: homeassistant
     id: backyard_temperature
     entity_id: sensor.backyard_temperature
