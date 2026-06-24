@@ -159,12 +159,7 @@ switch:
     entity_category: config
     icon: mdi:coffee
     restore_mode: RESTORE_DEFAULT_OFF
-    lambda: |-
-      if (id(stay_awake)) {
-        return true;
-      } else {
-        return false;
-      }
+    lambda: 'return id(stay_awake);'
     turn_on_action:
       - deep_sleep.prevent: deep_sleep_1
       - lambda: |-

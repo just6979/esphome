@@ -66,8 +66,7 @@ output:
     # the oled doesn't get noticeably brighter above 66%
     max_power: 0.66
     write_action:
-      lambda: |-
-        id(oled).set_contrast(state);
+      lambda: 'id(oled).set_contrast(state);'
 
 light:
   - platform: monochromatic
@@ -81,11 +80,9 @@ light:
       color_mode: BRIGHTNESS
       brightness: 50%
     on_turn_on:
-      lambda: |-
-        id(oled).turn_on();
+      lambda: 'id(oled).turn_on();'
     on_turn_off:
-      lambda: |-
-        id(oled).turn_off();
+      lambda: 'id(oled).turn_off();'
 
   - platform: status_led
     id: status_light
