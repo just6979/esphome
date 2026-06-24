@@ -92,6 +92,16 @@ wifi:
   password: !secret wifi_password
   use_psram: true
 
+globals:
+  - id: stay_awake
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
+  - id: wake_status
+    type: std::string
+    restore_value: yes
+    initial_value: '"AWAKE"'
+
 button:
   - platform: template
     name: "Refresh Display"
@@ -121,38 +131,7 @@ output:
     id: epd_power
     inverted: false
 
-globals:
-  - id: stay_awake
-    type: bool
-    restore_value: yes
-    initial_value: "false"
-  - id: wake_status
-    type: std::string
-    restore_value: yes
-    initial_value: '"AWAKE"'
-
 switch:
-#  - platform: gpio
-#    id: pa_enable
-#    name: "Speaker Power"
-#    pin:
-#      number: GPIO42
-#      mode:
-#        output: true
-#        pulldown: true
-#      inverted: true
-#
-#  - platform: gpio
-#    id: pa_control
-#    name: "Speaker Enable"
-#    pin:
-#      number: GPIO46
-#      mode:
-#        output: true
-#        pullup: true
-#      inverted: true
-#      ignore_strapping_warning: true
-
   - platform: template
     id: stay_awake_switch
     name: "Stay Awake"
@@ -176,6 +155,28 @@ switch:
       - script.execute: ble_stop_scan
       - component.update: epaper_display
       - deep_sleep.allow: deep_sleep_1
+
+#  - platform: gpio
+#    id: pa_enable
+#    name: "Speaker Power"
+#    pin:
+#      number: GPIO42
+#      mode:
+#        output: true
+#        pulldown: true
+#      inverted: true
+#
+#  - platform: gpio
+#    id: pa_control
+#    name: "Speaker Enable"
+#    pin:
+#      number: GPIO46
+#      mode:
+#        output: true
+#        pullup: true
+#      inverted: true
+#      ignore_strapping_warning: true
+
 
 binary_sensor:
   - platform: gpio

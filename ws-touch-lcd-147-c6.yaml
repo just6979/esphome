@@ -18,32 +18,6 @@ esp32:
   variant: ESP32C6
   flash_size: 8MB
 
-i2c:
-  sda: GPIO18
-  scl: GPIO19
-  frequency: 400kHz
-
-spi:
-  clk_pin: GPIO1
-  mosi_pin: GPIO2
-
-button:
-  - platform: template
-    name: "Next Page"
-    icon: mdi:page-next
-    on_press:
-      then:
-        - display.page.show_next: lcd
-        - component.update: lcd
-
-external_components:
-  - source: github://widget/esphome-components
-    components: [ axs5106 ]
-    refresh: 0s
-  #  - source: github://dala318/esphome-qmi8658
-  #    components: [qmi8658]
-  #    refresh: 5s
-
 globals:
   - id: last_touch_x
     type: int
@@ -77,6 +51,32 @@ globals:
     type: int
     restore_value: no
     initial_value: '0'
+
+i2c:
+  sda: GPIO18
+  scl: GPIO19
+  frequency: 400kHz
+
+spi:
+  clk_pin: GPIO1
+  mosi_pin: GPIO2
+
+button:
+  - platform: template
+    name: "Next Page"
+    icon: mdi:page-next
+    on_press:
+      then:
+        - display.page.show_next: lcd
+        - component.update: lcd
+
+external_components:
+  - source: github://widget/esphome-components
+    components: [ axs5106 ]
+    refresh: 0s
+  #  - source: github://dala318/esphome-qmi8658
+  #    components: [qmi8658]
+  #    refresh: 5s
 
 output:
   - platform: ledc

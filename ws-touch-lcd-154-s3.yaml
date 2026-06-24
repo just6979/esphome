@@ -76,6 +76,28 @@ wifi:
   on_disconnect:
     - script.execute: draw_display
 
+globals:
+  - id: init_in_progress
+    type: bool
+    restore_value: false
+    initial_value: 'true'
+  - id: voice_assistant_phase
+    type: int
+    restore_value: false
+    initial_value: ${voice_assist_not_ready_phase_id}
+  - id: global_first_active_timer
+    type: voice_assistant::Timer
+    restore_value: false
+  - id: global_is_timer_active
+    type: bool
+    restore_value: false
+  - id: global_first_timer
+    type: voice_assistant::Timer
+    restore_value: false
+  - id: global_is_timer
+    type: bool
+    restore_value: false
+
 binary_sensor:
   - platform: gpio
     pin:
@@ -122,7 +144,7 @@ output:
 
 light:
   - platform: monochromatic
-    id: display_backight
+    id: display_backlight
     name: "Display Backlight"
     entity_category: config
     output: backlight_output
@@ -622,28 +644,6 @@ select:
                         switch.is_off: mute
                       then:
                         - micro_wake_word.start
-
-globals:
-  - id: init_in_progress
-    type: bool
-    restore_value: false
-    initial_value: "true"
-  - id: voice_assistant_phase
-    type: int
-    restore_value: false
-    initial_value: ${voice_assist_not_ready_phase_id}
-  - id: global_first_active_timer
-    type: voice_assistant::Timer
-    restore_value: false
-  - id: global_is_timer_active
-    type: bool
-    restore_value: false
-  - id: global_first_timer
-    type: voice_assistant::Timer
-    restore_value: false
-  - id: global_is_timer
-    type: bool
-    restore_value: false
 
 image:
   - file: ${error_illustration_file}
