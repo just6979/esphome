@@ -53,12 +53,10 @@ binary_sensor:
       ignore_strapping_warning: true
     on_click:
       then:
-        - lambda: |-
-            id(oled).is_on() ? id(oled).turn_off(): id(oled).turn_on();
-        - component.update: oled
+        - light.toggle: display_light
     on_double_click:
       then:
-        - light.toggle: light_status
+        - light.toggle: status_light
 
 output:
   - platform: template
@@ -90,7 +88,7 @@ light:
         id(oled).turn_off();
 
   - platform: status_led
-    id: light_status
+    id: status_light
     name: "Status LED"
     icon: mdi:led-outline
     entity_category: config
