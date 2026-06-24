@@ -53,34 +53,6 @@ light:
     restore_mode: RESTORE_AND_ON
 
 sensor:
-  - platform: internal_temperature
-    name: "System Temperature"
-    id: temperature_system
-    entity_category: diagnostic
-
-  - platform: combination
-    id: temperature_system_f
-    type: linear
-    sources:
-      - source: temperature_system
-        coefficient: 1.0
-    filters:
-      - lambda: return x * (9.0/5.0) + 32.0;
-    unit_of_measurement: "°F"
-
-  #  - platform: bme280_i2c
-#    address: 0x76
-#    update_interval: 60s
-#    temperature:
-#      name: "Temperature"
-#      id: temperature
-#    humidity:
-#      name: "Humidity"
-#      id: humidity
-#    pressure:
-#      name: "Pressure"
-#      id: pressure
-
   - platform: sht4x
     heater_max_duty: 0.01
     temperature:
@@ -115,7 +87,7 @@ sensor:
       - source: temperature
         coefficient: 1.0
     filters:
-      - lambda: return x * (9.0/5.0) + 32.0;
+      - lambda: return x * (9.0 / 5.0) + 32.0;
     unit_of_measurement: "°F"
 
   - platform: homeassistant
@@ -308,7 +280,7 @@ display:
           }
 
           it.print(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "System");
-          it.printf(middle, line6, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.1f °F", id(temperature_system_f).state);
+          it.printf(middle, line6, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.1f °F", id(system_temperature_f).state);
           it.printf(middle, line7, id(font_medium), id(color_blue), TextAlign::TOP_CENTER, "%.0fs Uptime", id(uptime_s).state);
 
           it.printf(right1, bottom1, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2 / 3");

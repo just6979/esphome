@@ -16,10 +16,6 @@ i2c:
   frequency: 400kHz
 
 sensor:
-  - platform: internal_temperature
-    name: "Internal Temperature"
-    entity_category: diagnostic
-
   - platform: bme280_i2c
     address: 0x76
     update_interval: 60s
@@ -36,6 +32,16 @@ sensor:
     pressure:
       name: "Pressure"
       id: bme_pres
+
+  - platform: combination
+    id: bme_temp_f
+    type: linear
+    sources:
+      - source: bme_temp
+        coefficient: 1.0
+    filters:
+      - lambda: return x * (9.0 / 5.0) + 32.0;
+    unit_of_measurement: "°F"
 
 binary_sensor:
   - platform: gpio
@@ -107,6 +113,6 @@ display:
     id: oled
     rotation: 180
     lambda: |-
-      it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", (id(bme_temp).state * 9.0 / 5.0) + 32);
+      it.printf(36,  0, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f °F", id(bme_temp_f).state);
       it.printf(36, 13, id(ubuntu_mono), TextAlign::TOP_CENTER, "%.1f %%H", id(bme_hum).state);
       it.printf(36, 26, id(ubuntu_mono), TextAlign::TOP_CENTER, "%4.f mb", id(bme_pres).state);

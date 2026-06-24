@@ -74,21 +74,6 @@ i2c:
     frequency: 400kHz
 
 sensor:
-  - platform: internal_temperature
-    name: "System Temperature"
-    id: temperature_system
-    entity_category: diagnostic
-
-  - platform: combination
-    id: temperature_system_f
-    type: linear
-    sources:
-      - source: temperature_system
-        coefficient: 1.0
-    filters:
-      - lambda: return x * (9.0/5.0) + 32.0;
-    unit_of_measurement: "°F"
-
   - platform: sht4x
     i2c_id: i2c_qt
     heater_max_duty: 0.01

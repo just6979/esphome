@@ -244,10 +244,6 @@ sensor:
         return -1;
       }
 
-  - platform: internal_temperature
-    name: "Internal Temperature"
-    entity_category: diagnostic
-
   - platform: shtcx
     temperature:
       name: "Temperature"
