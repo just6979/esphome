@@ -10,6 +10,30 @@ esp32:
   variant: ESP32C3
   flash_size: 4MB
 
+globals:
+  - id: led_was_on
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
+
+interval:
+  interval: 1min
+  then:
+    - if:
+        condition:
+          lambda: |-
+            int hour = id(ha_time).now().hour;
+            return (hour < 6 || hour > 23);
+        then:
+          lambda: |-
+            id(led_was_on) = id(oled).is_on();
+            id(status_light).turn_off();
+        else:
+          lambda: |-
+            if (id(led_was_on)) {
+              id(status_light).turn_on();
+            }
+
 i2c:
   sda: GPIO5
   scl: GPIO6
