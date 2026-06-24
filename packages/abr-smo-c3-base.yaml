@@ -13,7 +13,6 @@ esp32:
 i2c:
   sda: GPIO5
   scl: GPIO6
-  scan: True
   frequency: 400kHz
 
 sensor:

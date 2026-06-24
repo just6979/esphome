@@ -21,7 +21,6 @@ esp32:
 i2c:
   sda: GPIO18
   scl: GPIO19
-  scan: True
   frequency: 400kHz
 
 spi:

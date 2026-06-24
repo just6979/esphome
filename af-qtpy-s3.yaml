@@ -66,13 +66,11 @@ i2c:
   - id: i2c_qt
     sda: GPIO41
     scl: GPIO40
-    scan: true
     frequency: 400kHz
 
   - id: i2c_pins
     sda: GPIO7
     scl: GPIO6
-    scan: true
     frequency: 400kHz
 
 sensor:

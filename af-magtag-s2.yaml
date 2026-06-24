@@ -201,7 +201,6 @@ deep_sleep:
 i2c:
   sda: GPIO33
   scl: GPIO34
-  scan: true
   frequency: 400kHz
 
 sensor:

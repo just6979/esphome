@@ -23,7 +23,6 @@ i2c:
   scl:
     number: GPIO8
     ignore_strapping_warning: true
-  scan: True
   frequency: 400kHz
 
 spi:
