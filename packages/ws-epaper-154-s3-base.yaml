@@ -240,13 +240,52 @@ sensor:
         return -1;
       }
 
-  - platform: shtcx
+  - platform: sht4x
+    heater_max_duty: 0.01
     temperature:
-      name: "Temperature"
-      id: temperature
+      name: "Temperature (SHT4X)"
+      id: temperature_sht4x
+      disabled_by_default: true
     humidity:
       name: "Humidity"
       id: humidity
+
+  - platform: spa06_i2c
+    temperature:
+      name: "Temperature (SPA06)"
+      id: temperature_spa06
+      disabled_by_default: true
+    pressure:
+      name: "Pressure"
+      id: pressure
+
+  - platform: combination
+    name: "Temperature"
+    id: temperature
+    type: median
+    sources:
+      - source: temperature_sht4x
+      - source: temperature_spa06
+
+  - platform: combination
+    id: temperature_f
+    type: linear
+    sources:
+      - source: temperature
+        coefficient: 1.0
+    filters:
+      - lambda: return x * (9.0 / 5.0) + 32.0;
+    unit_of_measurement: "°F"
+
+  - platform: shtcx
+    temperature:
+      name: "Integrated Temperature"
+      id: integrated_temperature
+      disabled_by_default: true
+    humidity:
+      name: "Integrated Humidity"
+      id: integrated_humidity
+      disabled_by_default: true
 
   - platform: homeassistant
     id: backyard_temperature
