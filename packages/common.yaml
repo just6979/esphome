@@ -39,6 +39,13 @@ button:
     name: Restart
     entity_category: diagnostic
 
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      id: wifi_ip
+      icon: mdi:ip-network
+
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal"

@@ -103,13 +103,10 @@ sensor:
     entity_id: sensor.outside_pool_temperature
 
 text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "IP Address"
-      id: wifi_ip
     ssid:
       name: "Connected SSID"
       id: wifi_ssid
+      icon: mdi:antenna
 
 binary_sensor:
   - platform: gpio
