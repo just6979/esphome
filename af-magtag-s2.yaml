@@ -17,10 +17,18 @@ esphome:
             - api.connected:
             - lambda: 'return id(ha_time).now().is_valid();'
         timeout: 30s
-    - globals.set:
-        id: initialized
-        value: 'true'
     - component.update: epaper_display
+
+  on_shutdown:
+    then:
+      - logger.log: "Getting ready for sleep"
+      - globals.set:
+          id: wake_status
+          value: '"ASLEEP"'
+      - component.update: epaper_display
+      - logger.log: "Sleeping in 5s"
+      - delay: 5s
+      - logger.log: "Sleeping now"
 
 esp32:
   variant: ESP32S2
@@ -33,6 +41,20 @@ psram:
 wifi:
   use_psram: true
 
+i2c:
+  sda: GPIO33
+  scl: GPIO34
+  frequency: 400kHz
+
+spi:
+  mosi_pin: GPIO35
+  clk_pin: GPIO36
+  miso_pin: GPIO37
+
+safe_mode:
+  id: safemode
+  boot_is_good_after: 15s
+
 button:
   - platform: template
     name: "Refresh Display"
@@ -40,27 +62,53 @@ button:
       - component.update: epaper_display
 
 globals:
-  - id: initialized
-    type: bool
-    restore_value: no
-    initial_value: "false"
   - id: stay_awake
     type: bool
     restore_value: yes
-    initial_value: "false"
+    initial_value: "true"
   - id: wake_status
     type: std::string
     restore_value: yes
     initial_value: '"Awake"'
 
+#deep_sleep:
+#  id: deep_sleep_1
+#  run_duration:
+#    default: 60s
+#  sleep_duration: 15min
+#  esp32_ext1_wakeup:
+#    pins:
+#      - number: GPIO0
+#        inverted: true
+#        mode: INPUT_PULLUP
+#        allow_other_uses: true
+#        ignore_strapping_warning: true
+#      - number: GPIO11
+#        inverted: true
+#        mode: INPUT_PULLUP
+#        allow_other_uses: true
+#      - number: GPIO12
+#        inverted: true
+#        mode: INPUT_PULLUP
+#        allow_other_uses: true
+#      - number: GPIO14
+#        inverted: true
+#        mode: INPUT_PULLUP
+#        allow_other_uses: true
+#      - number: GPIO15
+#        inverted: true
+#        mode: INPUT_PULLUP
+#        allow_other_uses: true
+#    mode: ANY_LOW
+
 switch:
   - platform: template
     id: stay_awake_switch
     name: "Stay Awake"
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: RESTORE_DEFAULT_ON
     lambda: 'return id(stay_awake);'
     turn_on_action:
-      - deep_sleep.prevent: deep_sleep_1
+#      - deep_sleep.prevent: deep_sleep_1
       - lambda: |-
           id(stay_awake) = true;
           id(wake_status) = "Awake";
@@ -72,13 +120,19 @@ switch:
           id(wake_status) = "Sleepy";
       - logger.log: "Getting Sleepy"
       - component.update: epaper_display
-      - deep_sleep.allow: deep_sleep_1
+#      - deep_sleep.allow: deep_sleep_1
 
 power_supply:
-  - id: 'neopixel_power'
+  - id: neopixel_power
     pin:
       number: GPIO21
       inverted: true
+
+  - id: buzzer_power
+    pin:
+      number: GPIO16
+      # default to turning off the PA power
+      mode: INPUT_PULLDOWN
 
 light:
   - platform: esp32_rmt_led_strip
@@ -97,35 +151,24 @@ light:
       - addressable_twinkle:
       - addressable_random_twinkle:
       - addressable_fireworks:
-      - addressable_flicker:
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
 
-#  - platform: status_led
-#    id: red_led
-#    name: "Red LED"
-#    pin: GPIO13
-#    entity_category: config
-
-  - platform: monochromatic
+  - platform: status_led
     id: red_led
     name: "Red LED"
-    output: gpio_13
-    restore_mode: RESTORE_DEFAULT_OFF
+    output: red_led_pin
     entity_category: config
 
 output:
   - platform: ledc
+    id: red_led_pin
     pin: GPIO13
-    id: gpio_13
 
-  - platform: gpio
-    pin: GPIO16
-    id: speaker_enable
-
-  - platform: gpio
+  - platform: ledc
+    power_supply: buzzer_power
+    id: buzzer
     pin: GPIO17
-    id: speaker
 
 binary_sensor:
   - platform: gpio
@@ -135,73 +178,92 @@ binary_sensor:
       inverted: true
       mode: INPUT_PULLUP
       ignore_strapping_warning: true
-      allow_other_uses: true
+#      allow_other_uses: true
+    on_click:
+      then:
+        - switch.toggle: stay_awake_switch
   - platform: gpio
+    id: button_a
     pin:
       number: GPIO15
       inverted: true
-      allow_other_uses: true
-    id: button_a
+      mode: INPUT_PULLUP
+#      allow_other_uses: true
+    on_press:
+      then:
+        - output.turn_on: buzzer
+        - output.ledc.set_frequency:
+            id: buzzer
+            frequency: "1kHz"
+        - output.set_level:
+            id: buzzer
+            level: "10%"
+    on_release:
+      then:
+        - output.turn_off: buzzer
   - platform: gpio
+    id: button_b
     pin:
       number: GPIO14
       inverted: true
-      allow_other_uses: true
-    id: button_b
+      mode: INPUT_PULLUP
+#      allow_other_uses: true
+    on_press:
+      then:
+        - output.turn_on: buzzer
+        - output.ledc.set_frequency:
+            id: buzzer
+            frequency: "2kHz"
+        - output.set_level:
+            id: buzzer
+            level: "10%"
+    on_release:
+      then:
+        - output.turn_off: buzzer
   - platform: gpio
+    id: button_c
     pin:
       number: GPIO12
       inverted: true
-      allow_other_uses: true
-    id: button_c
+      mode: INPUT_PULLUP
+#      allow_other_uses: true
+    on_press:
+      then:
+        - output.turn_on: buzzer
+        - output.ledc.set_frequency:
+            id: buzzer
+            frequency: "4kHz"
+        - output.set_level:
+            id: buzzer
+            level: "10%"
+    on_release:
+      then:
+        - output.turn_off: buzzer
   - platform: gpio
+    id: button_d
     pin:
       number: GPIO11
       inverted: true
-      allow_other_uses: true
-    id: button_d
-    on_click:
-      - light.toggle: neopixels
-
-deep_sleep:
-  id: deep_sleep_1
-  run_duration:
-    default: 60s
-  sleep_duration: 60min
-  esp32_ext1_wakeup:
-    pins:
-      - number: GPIO0
-        inverted: true
-        mode: INPUT_PULLUP
-        allow_other_uses: true
-        ignore_strapping_warning: true
-      - number: GPIO11
-        inverted: true
-        mode: INPUT_PULLUP
-        allow_other_uses: true
-      - number: GPIO12
-        inverted: true
-        mode: INPUT_PULLUP
-        allow_other_uses: true
-      - number: GPIO14
-        inverted: true
-        mode: INPUT_PULLUP
-        allow_other_uses: true
-      - number: GPIO15
-        inverted: true
-        mode: INPUT_PULLUP
-        allow_other_uses: true
-    mode: ANY_LOW
-
-i2c:
-  sda: GPIO33
-  scl: GPIO34
-  frequency: 400kHz
+      mode: INPUT_PULLUP
+#      allow_other_uses: true
+    on_press:
+      then:
+        - output.turn_on: buzzer
+        - output.ledc.set_frequency:
+            id: buzzer
+            frequency: "4kHz"
+        - output.set_level:
+            id: buzzer
+            level: "10%"
+    on_release:
+      then:
+        - output.turn_off: buzzer
 
 sensor:
   - platform: adc
     id: battery_voltage
     name: "Battery Voltage"
+    entity_category: diagnostic
     pin: GPIO4
     accuracy_decimals: 2
     update_interval: 60s
@@ -209,41 +271,48 @@ sensor:
     filters:
       - multiply: 2.0
 
-  - platform: sht4x
-    heater_max_duty: 0.01
-    temperature:
-      id: temperature_sht4x
-      name: "Temperature (SHT4X)"
-    humidity:
-      id: humidity
-      name: "Humidity"
+  - platform: adc
+    id: light_sensor
+    name: "Light Sensor"
+    pin: GPIO3
+    accuracy_decimals: 2
+    update_interval: 60s
+    attenuation: auto
 
-  - platform: spa06_i2c
-    temperature:
-      id: temperature_spa06
-      name: "Temperature (SPA06)"
-    pressure:
-      id: pressure
-      name: "Pressure"
-
-  - platform: combination
-    name: "Temperature"
-    id: temperature
-    type: median
-    sources:
-      - source: temperature_sht4x
-      - source: temperature_spa06
-
-  - platform: combination
-    id: temperature_f
-    type: linear
-    sources:
-      - source: temperature
-        coefficient: 1.0
-    filters:
-      - lambda: return x * (9.0 / 5.0) + 32.0;
-    unit_of_measurement: "°F"
-
+#  - platform: sht4x
+#    heater_max_duty: 0.01
+#    temperature:
+#      id: temperature_sht4x
+#      name: "Temperature (SHT4X)"
+#    humidity:
+#      id: humidity
+#      name: "Humidity"
+#
+#  - platform: spa06_i2c
+#    temperature:
+#      id: temperature_spa06
+#      name: "Temperature (SPA06)"
+#    pressure:
+#      id: pressure
+#      name: "Pressure"
+#
+#  - platform: combination
+#    name: "Temperature"
+#    id: temperature
+#    type: median
+#    sources:
+#      - source: temperature_sht4x
+#      - source: temperature_spa06
+#
+#  - platform: combination
+#    id: temperature_f
+#    type: linear
+#    sources:
+#      - source: temperature
+#        coefficient: 1.0
+#    filters:
+#      - lambda: return x * (9.0 / 5.0) + 32.0;
+#    unit_of_measurement: "°F"
 
   - platform: homeassistant
     id: backyard_temperature
@@ -257,15 +326,30 @@ sensor:
     id: pool_temperature
     entity_id: sensor.outside_pool_temperature
 
+  - platform: homeassistant
+    id: indoor_temperature
+    entity_id: sensor.indoor_temperature
+
+  - platform: homeassistant
+    id: indoor_humidity
+    entity_id: sensor.indoor_humidity
+
+  - platform: homeassistant
+    id: pressure
+    entity_id: sensor.pressure
+
 font:
-  - file: "gfonts://Roboto"
+  - file:
+      type: gfonts
+      family: Inconsolata
+      weight: 800
     id: font_xsmall
     size: 16
   - file: "gfonts://Roboto"
-    id: font_small
+    id: roboto_20
     size: 20
   - file: "gfonts://Roboto"
-    id: font_medium
+    id: roboto_24
     size: 24
   - file: "gfonts://Roboto"
     id: roboto_40
@@ -273,6 +357,12 @@ font:
   - file: "gfonts://Roboto"
     id: roboto_60
     size: 60
+  - file:
+      type: gfonts
+      family: "Doto"
+      weight: 700
+    id: doto_700_32
+    size: 36
   - file:
       type: gfonts
       family: "Doto"
@@ -285,11 +375,66 @@ font:
       weight: 600
     id: doto_600_56
     size: 56
-
-spi:
-  mosi_pin: GPIO35
-  clk_pin: GPIO36
-  miso_pin: GPIO37
+  - file:
+      type: gfonts
+      family: Inconsolata
+      weight: 700
+    id: font_small
+    size: 20
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 700
+    id: font_fancy_small
+    size: 20
+  - file:
+      type: gfonts
+      family: Inconsolata
+      weight: 700
+    id: font_medium
+    size: 24
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
+    id: font_fancy_xmedium
+    size: 28
+  - file:
+      type: gfonts
+      family: Inconsolata
+      weight: 500
+    id: font_large
+    size: 32
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
+    id: font_fancy_large
+    size: 32
+  - file:
+      type: gfonts
+      family: Inconsolata
+      weight: 500
+    id: font_xlarge
+    size: 42
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 500
+    id: font_fancy_xlarge
+    size: 42
+  - file:
+      type: gfonts
+      family: Inconsolata
+      weight: 500
+    id: font_xxlarge
+    size: 54
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 500
+    id: font_fancy_xxlarge
+    size: 96
 
 display:
   - platform: waveshare_epaper
@@ -301,16 +446,28 @@ display:
     dc_pin: GPIO7
     reset_pin: GPIO6
     busy_pin: GPIO5
-#    update_interval: 20s
+    update_interval: 60s
 #    full_update_every: 1
     rotation: 270
     lambda: |-
       ESP_LOGI("display", "Updating display");
       
-      if (!id(initialized)) {
-        it.print(it.get_width() / 2, it.get_height() / 2, id(roboto_40), TextAlign::CENTER, "Starting...");
-        return;
-      }      
+      int top = 0;
+      int mid_y = it.get_height() / 2;
+      int bottom = it.get_height();
+      int left = 0;
+      int mid_x = it.get_width() / 2;
+      int right = it.get_width();
+
+      int line1 = top + id(font_fancy_large).get_baseline() + 5;
+
+      //it.print(middle, top, id(font_small), TextAlign::TOP_CENTER, "BACK YARD");
+      //it.printf(left + 9, top2, id(font_fancy_large), TextAlign::TOP_LEFT, "%.1f°", id(backyard_temperature).state);
+      //it.printf(right - 9, top2, id(font_fancy_large), TextAlign::TOP_RIGHT, "%.0f%%", id(backyard_humidity).state);
+
+      it.print(mid_x, top, id(font_fancy_large), TextAlign::TOP_CENTER, "POOL");
+      it.printf(mid_x, line1, id(font_fancy_xlarge), TextAlign::TOP_CENTER, "%.1f°", id(pool_temperature).state);
       
-      it.strftime(it.get_width() / 2, it.get_height() / 4, id(doto_600_56), TextAlign::CENTER, "%H:%M:%S", id(ha_time).now());
-      it.strftime(it.get_width() / 2, it.get_height() * 3 / 4, id(doto_600_42), TextAlign::CENTER, "%a %b %d", id(ha_time).now());
+      it.strftime(left + 4, bottom, id(font_xsmall), TextAlign::BOTTOM_LEFT, "%H:%M %Y-%m-%d", id(ha_time).now());
+
+      it.print(right - 4, bottom, id(font_xsmall), TextAlign::BOTTOM_RIGHT, id(wake_status).c_str());
