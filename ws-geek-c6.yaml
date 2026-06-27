@@ -108,11 +108,11 @@ sensor:
 
   - platform: homeassistant
     id: backyard_temperature
-    entity_id: sensor.backyard_temperature
+    entity_id: sensor.outside_pool_deck_temperature
 
   - platform: homeassistant
     id: backyard_humidity
-    entity_id: sensor.backyard_humidity
+    entity_id: sensor.outside_pool_deck_humidity
 
   - platform: homeassistant
     id: pool_temperature
