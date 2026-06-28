@@ -1,5 +1,5 @@
 packages:
-  common-options: !include common-ble-sc.yaml
+  common-options: !include common.yaml
 
 substitutions:
   device_name: abr-smo-c3-base
@@ -9,6 +9,7 @@ substitutions:
 esp32:
   variant: ESP32C3
   flash_size: 4MB
+  cpu_frequency: 80MHz
 
 globals:
   - id: led_was_on
