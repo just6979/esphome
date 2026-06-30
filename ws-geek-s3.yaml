@@ -195,24 +195,10 @@ font:
     id: font_small
     size: 14
 
-# ST7789 — 1.14" 135×240 (Waveshare ESP32-C6-GEEK)
-# Using "Custom" model so we can set the exact offsets for this panel.
-# ST7789 controller is 240×320; our panel is 135×240.
-# Portrait gaps: col 52|135|53 = 240, row 40|240|40 = 320
 display:
   - platform: mipi_spi
-    model: st7789v
+    model: WAVESHARE-ESP32-S3-GEEK
     id: lcd
-    dimensions:
-      width: 135
-      height: 240
-      offset_width: 52
-      offset_height: 40
-    invert_colors: true
-    dc_pin: GPIO8
-    reset_pin: GPIO9
-    cs_pin: GPIO10
-    data_rate: 40MHz
     update_interval: 10s
     pages:
       - id: page_pool
