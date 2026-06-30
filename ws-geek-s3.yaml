@@ -19,7 +19,7 @@ esp32:
   flash_size: 16MB
 
 psram:
-  mode: octal
+  mode: quad
   speed: 80MHz
   ignore_not_found: false
 
