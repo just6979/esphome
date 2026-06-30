@@ -79,6 +79,7 @@ sensor:
     sources:
       - source: temperature_sht4x
       - source: temperature_spa06
+    accuracy_decimals: 1
 
   - platform: combination
     id: temperature_f
@@ -89,6 +90,7 @@ sensor:
     filters:
       - lambda: return x * (9.0 / 5.0) + 32.0;
     unit_of_measurement: "°F"
+    accuracy_decimals: 1
 
   - platform: bme280_i2c
     address: 0x76
