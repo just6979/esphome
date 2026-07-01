@@ -1,0 +1,280 @@
+esphome:
+  on_boot:
+    priority: -100
+    then:
+      - light.turn_on:
+          id: lcd_backlight
+          brightness: 75%
+
+i2c:
+  sda: ${sda_pin}
+  scl: ${scl_pin}
+  frequency: 400kHz
+
+spi:
+  clk_pin: ${clk_pin}
+  mosi_pin: ${mosi_pin}
+
+button:
+  - platform: template
+    name: "Next Page"
+    icon: mdi:page-next
+    on_press:
+      then:
+        - display.page.show_next: lcd
+        - component.update: lcd
+
+output:
+  - platform: ledc
+    pin: ${backlight_pin}
+    id: backlight_pin
+
+light:
+  - platform: monochromatic
+    output: backlight_pin
+    name: "Display Backlight"
+    entity_category: config
+    id: lcd_backlight
+    icon: mdi:brightness-7
+    restore_mode: RESTORE_AND_ON
+
+sensor:
+  - platform: sht4x
+    heater_max_duty: 0.01
+    temperature:
+      name: "Temperature (SHT4X)"
+      id: temperature_sht4x
+      disabled_by_default: true
+    humidity:
+      name: "Humidity"
+      id: humidity
+
+  - platform: spa06_i2c
+    temperature:
+      name: "Temperature (SPA06)"
+      id: temperature_spa06
+      disabled_by_default: true
+    pressure:
+      name: "Pressure"
+      id: pressure
+
+  - platform: combination
+    name: "Temperature"
+    id: temperature
+    type: median
+    sources:
+      - source: temperature_sht4x
+      - source: temperature_spa06
+    accuracy_decimals: 1
+
+  - platform: combination
+    id: temperature_f
+    type: linear
+    sources:
+      - source: temperature
+        coefficient: 1.0
+    filters:
+      - lambda: return x * (9.0 / 5.0) + 32.0;
+    unit_of_measurement: "°F"
+    accuracy_decimals: 1
+
+  - platform: bme280_i2c
+    address: 0x76
+    update_interval: 60s
+    temperature:
+      name: "Temperature (BME)"
+      id: bme_temp
+      disabled_by_default: true
+    humidity:
+      name: "Humidity (BME)"
+      id: bme_hum
+      disabled_by_default: true
+    pressure:
+      name: "Pressure (BME)"
+      id: bme_pres
+      disabled_by_default: true
+
+  - platform: homeassistant
+    id: backyard_temperature
+    entity_id: sensor.outside_pool_deck_temperature
+
+  - platform: homeassistant
+    id: backyard_humidity
+    entity_id: sensor.outside_pool_deck_humidity
+
+  - platform: homeassistant
+    id: pool_temperature
+    entity_id: sensor.outside_pool_temperature
+
+text_sensor:
+  - platform: wifi_info
+    ssid:
+      name: "Connected SSID"
+      id: wifi_ssid
+      icon: mdi:antenna
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+      mode: INPUT_PULLUP
+      ignore_strapping_warning: true
+    id: button1
+    on_press:
+      then:
+        - display.page.show_next: lcd
+        - component.update: lcd
+
+color:
+  - id: color_white
+    red: 100%
+    green: 100%
+    blue: 100%
+  - id: color_light_grey
+    red: 75%
+    green: 75%
+    blue: 75%
+  - id: color_grey
+    red: 50%
+    green: 50%
+    blue: 50%
+  - id: color_dark_grey
+    red: 25%
+    green: 25%
+    blue: 25%
+  - id: color_black
+    red: 0%
+    green: 0%
+    blue: 0%
+  - id: color_red
+    red: 100%
+  - id: color_green
+    green: 100%
+  - id: color_blue
+    blue: 100%
+  - id: color_yellow
+    red: 100%
+    green: 100%
+  - id: color_orange
+    red: 100%
+    green: 64.7%
+    blue: 0%
+
+font:
+  - file:
+      type: gfonts
+      family: Stick No Bills
+      weight: 600
+    id: font_xlarge
+    size: 48
+  - file: "gfonts://Roboto"
+    id: font_medium
+    size: 20
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 14
+
+# ST7789 — 1.14" 135×240 (Waveshare ESP32-C6-GEEK)
+# Using "Custom" model so we can set the exact offsets for this panel.
+# ST7789 controller is 240×320; our panel is 135×240.
+# Portrait gaps: col 52|135|53 = 240, row 40|240|40 = 320
+display:
+  - platform: mipi_spi
+    id: lcd
+    dimensions:
+      width: 135
+      height: 240
+      offset_width: 52
+      offset_height: 40
+    invert_colors: true
+    data_rate: 40MHz
+    update_interval: 10s
+    pages:
+      - id: page_pool
+        lambda: |-
+          const int middle = 67;
+          const int line1 = 3;
+          const int line2 = 30;
+          const int line3 = 47;
+          const int line5 = 113;
+          const int line6 = 140;
+          const int line7 = 165;
+          const int right1 = 120;
+          const int bottom1 = 230;
+
+          it.fill(id(color_black));
+
+          if (id(api_id).is_connected()) {
+            it.print(middle, line1, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "Pool");
+            it.printf(middle, line3, id(font_xlarge), id(color_blue), TextAlign::TOP_CENTER, "%.1f°", id(pool_temperature).state);
+
+            it.printf(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
+            it.printf(middle, line6, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f °F", id(backyard_temperature).state);
+            it.printf(middle, line7, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f %%H", id(backyard_humidity).state);
+          } else {
+            it.print(middle, line5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
+
+          it.printf(right1, bottom1, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 1 / 3");
+
+      - id: page_climate
+        lambda: |-
+          const int middle = 67;
+          const int line1 = 3;
+          const int line2 = 30;
+          const int line3 = 55;
+          const int line4 = 80;
+          const int line5 = 113;
+          const int line6 = 140;
+          const int line7 = 165;
+          const int right1 = 120;
+          const int bottom1 = 230;
+          
+          it.fill(id(color_black));
+
+          it.printf(middle, line1, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Indoors");
+          it.printf(middle, line2, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f °F", id(temperature_f).state);
+          it.printf(middle, line3, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f %%H", id(humidity).state);
+          it.printf(middle, line4, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.0f mb", id(pressure).state / 100.0);
+
+          if (id(api_id).is_connected()) {
+            it.printf(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "Backyard");
+            it.printf(middle, line6, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f °F", id(backyard_temperature).state);
+            it.printf(middle, line7, id(font_medium), id(color_light_grey), TextAlign::TOP_CENTER, "%.1f %%H", id(backyard_humidity).state);
+          } else {
+            it.print(middle, line5, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
+
+          it.printf(right1, bottom1, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2 / 3");
+
+      - id: page_status
+        lambda: |-
+          const int middle = 67;
+          const int line1 = 3;
+          const int line2 = 30;
+          const int line3 = 55;
+          const int line4 = 80;
+          const int line5 = 113;
+          const int line6 = 140;
+          const int line7 = 165;
+          const int right1 = 120;
+          const int bottom1 = 230;
+
+          it.fill(id(color_black));
+
+          it.print(middle, line1, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Network");
+
+          if (id(api_id).is_connected()) {
+            it.printf(middle, line2, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%s", id(wifi_ssid).state.c_str());
+            it.printf(middle, line3, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "%s", id(wifi_ip).state.c_str());
+            it.printf(middle, line4, id(font_medium), id(color_yellow), TextAlign::TOP_CENTER, "%.0f dBm", id(wifi_rssi).state);
+          } else {
+            it.print(middle, line2, id(font_medium), id(color_orange), TextAlign::TOP_CENTER, "Connecting...");
+          }
+
+          it.print(middle, line5, id(font_medium), id(color_green), TextAlign::TOP_CENTER, "System");
+          it.printf(middle, line6, id(font_medium), id(color_white), TextAlign::TOP_CENTER, "%.1f °F", id(system_temperature_f).state);
+          it.printf(middle, line7, id(font_medium), id(color_blue), TextAlign::TOP_CENTER, "%.0fs Uptime", id(uptime_s).state);
+
+          it.printf(right1, bottom1, id(font_small), id(color_dark_grey), TextAlign::BOTTOM_RIGHT, "Pg 2 / 3");
