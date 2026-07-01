@@ -115,11 +115,7 @@ text_sensor:
 
 binary_sensor:
   - platform: gpio
-    pin:
-      number: GPIO9
-      inverted: true
-      mode: INPUT_PULLUP
-      ignore_strapping_warning: true
+    pin: ${button_pin}
     id: button1
     on_press:
       then:
