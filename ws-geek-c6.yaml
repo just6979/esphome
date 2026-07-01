@@ -1,6 +1,6 @@
 packages:
   base: !include packages/ws-geek-base.yaml
-  common-options: !include packages/common-ble-sc.yaml
+  common-options: !include packages/common.yaml
 
 substitutions:
   device_name: ws-geek-c6
