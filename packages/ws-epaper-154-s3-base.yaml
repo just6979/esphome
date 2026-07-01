@@ -288,12 +288,12 @@ sensor:
       disabled_by_default: true
 
   - platform: homeassistant
-    id: backyard_temperature
-    entity_id: sensor.outside_pool_deck_temperature
+    id: outside_temperature
+    entity_id: sensor.outside_temperature
 
   - platform: homeassistant
-    id: backyard_humidity
-    entity_id: sensor.outside_pool_deck_humidity
+    id: outside_humidity
+    entity_id: sensor.outside_humidity
 
   - platform: homeassistant
     id: pool_temperature

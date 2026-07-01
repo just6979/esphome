@@ -39,8 +39,8 @@ display:
       it.fill(COLOR_OFF);
 
       it.print(middle, top1, id(font_small), COLOR_ON, TextAlign::TOP_CENTER, "BACK YARD");
-      it.printf(left + 9, top2, id(font_fancy_xlarge), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°", id(backyard_temperature).state);
-      it.printf(right - 9, top2, id(font_fancy_xlarge), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%", id(backyard_humidity).state);
+      it.printf(left + 9, top2, id(font_fancy_xlarge), COLOR_ON, TextAlign::TOP_LEFT, "%.1f°", id(outside_temperature).state);
+      it.printf(right - 9, top2, id(font_fancy_xlarge), COLOR_ON, TextAlign::TOP_RIGHT, "%.0f%%", id(outside_humidity).state);
       
       it.filled_rectangle(0, line1, 200, 2);
       
