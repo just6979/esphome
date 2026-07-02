@@ -1,5 +1,5 @@
 packages:
-  common-options: !include common-ble.yaml
+  common-options: !include common.yaml
 
 # on some single-core SoCs, Wi-Fi connects faster with bluetooth scanning off,
 # so wait for an API connection before scanning
@@ -18,6 +18,8 @@ esp32_ble_tracker:
   # for the tweak above
   scan_parameters:
     continuous: false
+
+bluetooth_proxy:
 
 script:
   - id: !extend ble_start_scan
