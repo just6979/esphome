@@ -71,6 +71,14 @@ api:
       then:
         - esp32_ble_tracker.stop_scan:
 
+  services:
+    - service: send_raw_command
+      variables:
+        command: int[]
+      then:
+        - remote_transmitter.transmit_raw:
+            code: !lambda 'return command;'
+
 ota:
   - platform: esphome
 
@@ -134,12 +142,12 @@ remote_receiver:
     id: ir_receiver
 
 remote_transmitter:
-  - pin:
-      number: ${RF_TX_PIN}
-    # OOK modulation for RF433 — keep duty at 100%
-    carrier_duty_percent: 100%
-    non_blocking: true
-    id: rf_transmitter
+#  - pin:
+#      number: ${RF_TX_PIN}
+#    # OOK modulation for RF433 — keep duty at 100%
+#    carrier_duty_percent: 100%
+#    non_blocking: true
+#    id: rf_transmitter
 
   - pin:
       number: ${IR_TX_PIN}
@@ -160,25 +168,18 @@ infrared:
     receiver_frequency: 38kHz
     remote_receiver_id: ir_receiver
 
-  # RF transmitter instance
-radio_frequency:
-  - platform: ir_rf_proxy
-    name: 433MHz RF Transmitter
-    id: rf_proxy_transmitter
-    frequency: 433.92MHz
-    remote_transmitter_id: rf_transmitter
-
-  - platform: ir_rf_proxy
-    name: 433MHz RF Receiver
-    id: rf_proxy_receiver
-    frequency: 433.92MHz
-    remote_receiver_id: rf_receiver
-
-climate:
-  - platform: ${AC_Platform_name}
-    transmitter_id: ir_transmitter
-    name: "AC"
-    receiver_id: ir_receiver
+#radio_frequency:
+#  - platform: ir_rf_proxy
+#    name: 433MHz RF Transmitter
+#    id: rf_proxy_transmitter
+#    frequency: 433.92MHz
+#    remote_transmitter_id: rf_transmitter
+#
+#  - platform: ir_rf_proxy
+#    name: 433MHz RF Receiver
+#    id: rf_proxy_receiver
+#    frequency: 433.92MHz
+#    remote_receiver_id: rf_receiver
 
 binary_sensor:
   - platform: gpio
