@@ -2,6 +2,9 @@ esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
   min_version: 2026.6.2
+  # most esp32-XX variants can handle 2Mbps uploads
+  platformio_options:
+    upload_speed: 2000000
 
 esp32:
   framework:
@@ -68,6 +71,7 @@ sensor:
       - lambda: return x * (9.0/5.0) + 32.0;
     unit_of_measurement: "°F"
 
+# overridden in `common-ble-sc.yaml`, but defined here to more easily share configs
 script:
   - id: ble_start_scan
     then:

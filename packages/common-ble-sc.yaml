@@ -2,7 +2,7 @@ packages:
   common-options: !include common.yaml
 
 # on some single-core SoCs, Wi-Fi connects faster with bluetooth scanning off,
-# so wait for an API connection before scanning
+# so only scan when the native HA API is connected
 api:
   on_client_connected:
     - script.execute: ble_start_scan
@@ -15,12 +15,13 @@ api:
           - script.execute: ble_stop_scan
 
 esp32_ble_tracker:
-  # for the tweak above
+  # don't scan at start up, for the speed tweak above
   scan_parameters:
     continuous: false
 
 bluetooth_proxy:
 
+# override/extend here to actually en/dis-able BLE scanning
 script:
   - id: !extend ble_start_scan
     then:
