@@ -6,7 +6,7 @@ substitutions:
   friendly_name: "Athom RF-IR Remote"
   api_key: !secret athom-rf-ir-remote-key
 
-aaesphome:
+esphome:
   # this esp32 board can't handle 2Mbps uploads
   platformio_options:
     upload_speed: 921600
