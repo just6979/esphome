@@ -55,7 +55,7 @@ globals:
 i2c:
   sda: GPIO18
   scl: GPIO19
-  frequency: 400kHz
+  frequency: 100kHz
 
 spi:
   clk_pin: GPIO1

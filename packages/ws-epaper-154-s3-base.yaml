@@ -222,7 +222,7 @@ deep_sleep:
 i2c:
   sda: GPIO47
   scl: GPIO48
-  frequency: 50kHz
+  frequency: 100kHz
 
 sensor:
   - platform: template

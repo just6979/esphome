@@ -44,7 +44,7 @@ wifi:
 i2c:
   sda: GPIO33
   scl: GPIO34
-  frequency: 400kHz
+  frequency: 100kHz
 
 spi:
   mosi_pin: GPIO35

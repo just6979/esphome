@@ -66,12 +66,12 @@ i2c:
   - id: i2c_qt
     sda: GPIO41
     scl: GPIO40
-    frequency: 400kHz
+    frequency: 100kHz
 
   - id: i2c_pins
     sda: GPIO7
     scl: GPIO6
-    frequency: 400kHz
+    frequency: 100kHz
 
 sensor:
   - platform: sht4x

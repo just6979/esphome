@@ -44,7 +44,7 @@ button:
 i2c:
   sda: 20
   scl: 21
-  frequency: 400kHz
+  frequency: 100kHz
 
 text_sensor:
   - platform: wifi_info

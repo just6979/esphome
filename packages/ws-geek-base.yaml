@@ -9,7 +9,7 @@ esphome:
 i2c:
   sda: ${sda_pin}
   scl: ${scl_pin}
-  frequency: 400kHz
+  frequency: 100kHz
 
 spi:
   clk_pin: ${clk_pin}
