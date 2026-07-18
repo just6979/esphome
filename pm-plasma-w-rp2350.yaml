@@ -12,7 +12,7 @@ esphome:
   environment_variables:
     PLATFORMIO_BUILD_CACHE_DIR: ".pio/build-cache"
 
-rp2040:
+rp2:
   variant: RP2350
 
 logger:
