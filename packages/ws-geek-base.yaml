@@ -46,8 +46,9 @@ sensor:
       id: temperature_sht4x
       disabled_by_default: true
     humidity:
-      name: "Humidity"
-      id: humidity
+      name: "Humidity (SHT4X)"
+      id: humidity_sht4x
+      disabled_by_default: true
 
   - platform: spa06_i2c
     temperature:
@@ -55,8 +56,25 @@ sensor:
       id: temperature_spa06
       disabled_by_default: true
     pressure:
-      name: "Pressure"
-      id: pressure
+      name: "Pressure (SPA06)"
+      id: pressure_spa06
+      disabled_by_default: true
+
+  - platform: bme280_i2c
+    address: 0x76
+    update_interval: 60s
+    temperature:
+      name: "Temperature (BME280)"
+      id: temperature_bme280
+      disabled_by_default: true
+    humidity:
+      name: "Humidity (BME280)"
+      id: humidity_bme280
+      disabled_by_default: true
+    pressure:
+      name: "Pressure (BME280)"
+      id: pressure_bme280
+      disabled_by_default: true
 
   - platform: combination
     name: "Temperature"
@@ -65,6 +83,7 @@ sensor:
     sources:
       - source: temperature_sht4x
       - source: temperature_spa06
+      - source: temperature_bme280
     accuracy_decimals: 1
 
   - platform: combination
@@ -78,21 +97,23 @@ sensor:
     unit_of_measurement: "°F"
     accuracy_decimals: 1
 
-  - platform: bme280_i2c
-    address: 0x76
-    update_interval: 60s
-    temperature:
-      name: "Temperature (BME)"
-      id: bme_temp
-      disabled_by_default: true
-    humidity:
-      name: "Humidity (BME)"
-      id: bme_hum
-      disabled_by_default: true
-    pressure:
-      name: "Pressure (BME)"
-      id: bme_pres
-      disabled_by_default: true
+  - platform: combination
+    name: "Humidity"
+    id: humidity
+    type: median
+    sources:
+      - source: humidity_sht4x
+      - source: humidity_bme280
+    accuracy_decimals: 1
+
+  - platform: combination
+    name: "Pressure"
+    id: pressure
+    type: median
+    sources:
+      - source: pressure_spa06
+      - source: pressure_bme280
+    accuracy_decimals: 1
 
   - platform: homeassistant
     id: backyard_temperature
