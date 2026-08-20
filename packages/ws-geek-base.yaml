@@ -81,8 +81,8 @@ sensor:
     id: temperature
     type: median
     sources:
-      - source: temperature_sht4x
-      - source: temperature_spa06
+#      - source: temperature_sht4x
+#      - source: temperature_spa06
       - source: temperature_bme280
     accuracy_decimals: 1
 
@@ -102,8 +102,8 @@ sensor:
     id: humidity
     type: median
     sources:
-      - source: humidity_sht4x
       - source: humidity_bme280
+#      - source: humidity_sht4x
     accuracy_decimals: 1
 
   - platform: combination
@@ -112,16 +112,16 @@ sensor:
     type: median
     sources:
       - source: pressure_bme280
-      - source: pressure_spa06
+#      - source: pressure_spa06
     accuracy_decimals: 1
 
   - platform: homeassistant
     id: backyard_temperature
-    entity_id: sensor.outside_pool_deck_temperature
+    entity_id: sensor.ws_tiny_epaper_s3_temperature
 
   - platform: homeassistant
     id: backyard_humidity
-    entity_id: sensor.outside_pool_deck_humidity
+    entity_id: sensor.ws_tiny_epaper_s3__humidity
 
   - platform: homeassistant
     id: pool_temperature
