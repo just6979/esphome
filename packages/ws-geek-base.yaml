@@ -6,6 +6,9 @@ esphome:
           id: lcd_backlight
           brightness: 75%
 
+esp32:
+  cpu_frequency: 80MHz
+
 i2c:
   sda: ${sda_pin}
   scl: ${scl_pin}

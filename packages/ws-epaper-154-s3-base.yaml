@@ -81,6 +81,7 @@ esphome:
 esp32:
   variant: ESP32S3
   flash_size: 8MB
+  cpu_frequency: 80MHz
 
 psram:
   mode: octal
