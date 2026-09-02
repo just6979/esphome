@@ -1,5 +1,5 @@
 packages:
-  common-options: !include common-ble-sc.yaml
+  common-options: !include common.yaml
 
 substitutions:
   device_name: abr-smo-c3-base
