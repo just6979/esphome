@@ -298,7 +298,7 @@ sensor:
 
   - platform: homeassistant
     id: pool_temperature
-    entity_id: sensor.outside_pool_temperature
+    entity_id: sensor.pool_sensor_temperature
 
 #i2s_audio:
 #  i2s_lrclk_pin: GPIO38

@@ -128,7 +128,7 @@ sensor:
 
   - platform: homeassistant
     id: pool_temperature
-    entity_id: sensor.outside_pool_temperature
+    entity_id: sensor.pool_sensor_temperature
 
 text_sensor:
   - platform: wifi_info
